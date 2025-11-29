@@ -12,7 +12,10 @@ struct Home: View {
     
     var body: some View {
         VStack {
-            WeekSwiper()
+            WeekSwiper(
+                selectedDate: selectedDate,
+                onSelectDate: { date in selectedDate = date }
+            )
             Spacer()
         }
     }
