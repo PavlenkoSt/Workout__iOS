@@ -6,36 +6,11 @@ struct WeekSwiper: View {
     var body: some View {
         VStack(spacing: 16) {
             // Navigation buttons
-            HStack {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        currentWeekOffset -= 1
-                    }
-                }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                }
-                
-                Spacer()
-                
-                Text(weekRangeText())
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.gray)
-                
-                Spacer()
-                
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        currentWeekOffset += 1
-                    }
-                }) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                }
-            }
-            .padding(.horizontal)
+            WeekSwiperHeader(
+                onBackArrowClick: { currentWeekOffset += 1 },
+                onForwardArrowClick: { currentWeekOffset -= 1 },
+                weekRangeText: weekRangeText
+            )
             
             // Week carousel with TabView
             TabView(selection: $currentWeekOffset) {
@@ -102,7 +77,7 @@ struct DayCard: View {
     let day: (name: String, number: Int, isToday: Bool)
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 2) {
             Text(day.name)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(day.isToday ? .white : .gray)
