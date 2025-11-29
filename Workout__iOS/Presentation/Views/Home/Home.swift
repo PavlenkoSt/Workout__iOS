@@ -8,7 +8,16 @@
 import SwiftUI
 
 struct Home: View {
+    @State private var selectedDate = Date()
+    
     var body: some View {
-        Text("Home")
+        VStack {
+            WeekSwiper()
+            Spacer()
+        }
     }
+}
+
+#Preview {
+    Home()
 }
