@@ -16,6 +16,7 @@ struct Home: View {
                 selectedDate: selectedDate,
                 onSelectDate: { date in selectedDate = date }
             )
+            TrainingDayHeader(selectedDate: selectedDate)
             Spacer()
         }
     }
