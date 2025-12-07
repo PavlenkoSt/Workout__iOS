@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Home: View {
     @State private var selectedDate = Date()
-    
+
     var body: some View {
         VStack {
             WeekSwiper(
@@ -17,7 +17,7 @@ struct Home: View {
                 onSelectDate: { date in selectedDate = date }
             )
             TrainingDayHeader(selectedDate: selectedDate)
-            Spacer()
+            ExercisesList(selectedDate: selectedDate)
         }
     }
 }
