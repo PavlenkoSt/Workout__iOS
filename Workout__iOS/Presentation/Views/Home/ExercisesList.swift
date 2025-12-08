@@ -12,29 +12,9 @@ struct CustomListData: Identifiable {
     let title: String
 }
 
-// TODO hardcoded, use data from db instead
-let trainingDay: TrainingDay = TrainingDay(date: Date())
-let exercises: [TrainingExercise] = [
-    TrainingExercise(
-        name: "Push ups",
-        sets: 4,
-        reps: 12,
-        rest: 120,
-        trainingDay: trainingDay,
-        type: ExerciseType.dynamic
-    ),
-    TrainingExercise(
-        name: "Pull ups",
-        sets: 2,
-        reps: 20,
-        rest: 60,
-        trainingDay: trainingDay,
-        type: ExerciseType.dynamic
-    ),
-]
-
 struct ExercisesList: View {
     let selectedDate: Date
+    var exercises: [TrainingExercise]
 
     var body: some View {
         ScrollView {
@@ -50,5 +30,7 @@ struct ExercisesList: View {
 }
 
 #Preview {
-    ExercisesList(selectedDate: Date())
+    let trainingDay = getTrainingDayForPreview()
+
+    return ExercisesList(selectedDate: Date(), exercises: trainingDay.exercises)
 }

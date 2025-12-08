@@ -16,11 +16,19 @@ enum Tabs: Equatable, Hashable {
 
 struct ContentView: View {
     @State private var selectedTab: Tabs = .home
-    
+
+    @Environment(\.modelContext) var modelContext
+
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("Home", systemImage: "house.fill", value: .home) {
-                Home()
+                Home(
+                    viewModel: TrainingViewModel(
+                        repository: TrainingRepositoryImpl(
+                            context: modelContext
+                        )
+                    )
+                )
             }
             Tab("Goals", systemImage: "checkmark", value: .goals) {
                 Goals()
