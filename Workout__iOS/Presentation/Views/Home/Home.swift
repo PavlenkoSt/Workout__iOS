@@ -68,9 +68,15 @@ struct HomeContent: View {
                 onLoadExercises(selectedDate)
             }
         ).sheet(isPresented: $isShowingSheet) {
-            ExerciseSheet()
-                .presentationDragIndicator(.visible) .presentationDetents([.height(detentHeight)])
-                .readAndBindHeight(to: $detentHeight)
+            ExerciseSheet(
+                onSubmitDefaultExercise: { result in },
+                onSubmitLadderExercise: { result in },
+                onSubmitSimpleExercise: { result in }
+            )
+            .presentationDragIndicator(.visible).presentationDetents([
+                .height(detentHeight)
+            ])
+            .readAndBindHeight(to: $detentHeight)
         }
     }
 }
