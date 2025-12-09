@@ -23,6 +23,8 @@ struct Home: View {
 
 struct HomeContent: View {
     @State private var selectedDate = Date()
+    @State private var isShowingSheet = false
+    @State private var detentHeight: CGFloat = 0
 
     var onLoadExercises: (Date) -> Void
     var isLoading: Bool
@@ -48,7 +50,7 @@ struct HomeContent: View {
                         text: "No exercises yet",
                         btnText: "Add exercise"
                     ) {
-                        // TODO add exercise
+                        isShowingSheet = true
                     }
                 }
             } else {
@@ -56,7 +58,7 @@ struct HomeContent: View {
                     text: "No training yet",
                     btnText: "Create training"
                 ) {
-                    // TODO create training day and add exercise
+                    isShowingSheet = true
                 }
             }
 
@@ -65,7 +67,11 @@ struct HomeContent: View {
             {
                 onLoadExercises(selectedDate)
             }
-        )
+        ).sheet(isPresented: $isShowingSheet) {
+            ExerciseSheet()
+                .presentationDragIndicator(.visible) .presentationDetents([.height(detentHeight)])
+                .readAndBindHeight(to: $detentHeight)
+        }
     }
 }
 
