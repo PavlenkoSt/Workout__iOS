@@ -30,41 +30,48 @@ struct SimpleExerciseSubmitResult {
 // TODO style it nicely
 // TODO fix keyboard flicker when changing focus on submit
 struct ExerciseSheet: View {
-    var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in }
+    var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in
+    }
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
     @State private var exerciseType: ExerciseType = .dynamic
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Add exercise")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
+        VStack {
+            VStack(spacing: 16) {
+                Text("Add exercise")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
 
-            HStack {
-                Text("Exercise Type")
+                HStack {
+                    Text("Exercise Type")
 
-                Spacer()
+                    Spacer()
 
-                Picker("Exercise type", selection: $exerciseType) {
-                    Text("Dynamic").tag(ExerciseType.dynamic)
-                    Text("Static").tag(ExerciseType.staticType)
-                    Text("Ladder").tag(ExerciseType.ladder)
-                    Text("Warmup").tag(ExerciseType.warmup)
-                    Text("Handbalance session").tag(
-                        ExerciseType.handBalanceSession
-                    )
-                    Text("Flexibility session").tag(
-                        ExerciseType.flexibilitySession
-                    )
+                    Picker("Exercise type", selection: $exerciseType) {
+                        Text("Dynamic").tag(ExerciseType.dynamic)
+                        Text("Static").tag(ExerciseType.staticType)
+                        Text("Ladder").tag(ExerciseType.ladder)
+                        Text("Warmup").tag(ExerciseType.warmup)
+                        Text("Handbalance session").tag(
+                            ExerciseType.handBalanceSession
+                        )
+                        Text("Flexibility session").tag(
+                            ExerciseType.flexibilitySession
+                        )
+                    }
                 }
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 50)
+                .background(.white)
+                .roundedBorder()
             }
-            .padding(.vertical, 6)
-            .padding(.horizontal, 12)
-            .frame(minHeight: 50)
-            .background(.white)
-            .roundedBorder()
+
+            // spacer equal to error fields in forms
+            Text(" ").font(.caption)
 
             if exerciseType == ExerciseType.dynamic
                 || exerciseType == ExerciseType.staticType

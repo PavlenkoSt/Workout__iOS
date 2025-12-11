@@ -58,7 +58,7 @@ struct WeekSwiper: View {
     }
 
     private func handleWeekChange() {
-        let today = Date()
+        let today = Date().startOfDay
 
         // If viewing current week (offset = 0), select today
         if currentWeekOffset == 0 {
@@ -66,13 +66,14 @@ struct WeekSwiper: View {
         } else {
             // Otherwise, select Monday of the viewed week
             let monday = getMondayOfWeek(weekOffset: currentWeekOffset)
+                .startOfDay
             onSelectDate(monday)
         }
     }
 
     private func getMondayOfWeek(weekOffset: Int) -> Date {
         let calendar = Calendar.current
-        let today = Date()
+        let today = Date().startOfDay
 
         // Get Monday of current week
         let weekday = calendar.component(.weekday, from: today)
@@ -103,7 +104,7 @@ struct WeekSwiper: View {
         name: String, number: Int, isToday: Bool, date: Date
     ) {
         let calendar = Calendar.current
-        let today = Date()
+        let today = Date().startOfDay
 
         // Get Monday of current week
         let weekday = calendar.component(.weekday, from: today)
@@ -135,7 +136,7 @@ struct WeekSwiper: View {
 
     private func weekRangeText() -> String {
         let calendar = Calendar.current
-        let today = Date()
+        let today = Date().startOfDay
 
         // Get Monday of current week
         let weekday = calendar.component(.weekday, from: today)

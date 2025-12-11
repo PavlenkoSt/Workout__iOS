@@ -5,30 +5,56 @@
 //  Created by Stanislav Pavlenko on 08.12.2025.
 //
 
-import Foundation
 import Combine
+import Foundation
+import SwiftData
+import SwiftUI
 
 @MainActor
 class TrainingViewModel: ObservableObject {
-    @Published var trainingDay: TrainingDay? = nil
-    @Published var isLoading: Bool = false
-    
     private let repository: TrainingRepositoryImpl
 
     init(repository: TrainingRepositoryImpl) {
         self.repository = repository
     }
-    
-    func loadExercises(date: Date) {
-        isLoading = true
+
+    func addDefaultExercise(
+        date: Date,
+        exerciseFormResult: DefaultExerciseSubmitResult
+    ) {
         Task {
             do {
-                let trainingDay = try await repository.getTrainingDay(date: date)
-                self.trainingDay = trainingDay
+                let trainingDayExists = try? await repository.getTrainingDay(
+                    date: date
+                )
+
+                if let trainingDay = trainingDayExists {
+                    let exercise = TrainingExercise(
+                        name: exerciseFormResult.name,
+                        sets: exerciseFormResult.sets,
+                        reps: exerciseFormResult.reps,
+                        rest: exerciseFormResult.rest,
+                        trainingDay: trainingDay,
+                        type: exerciseFormResult.exerciseType
+                    )
+                    
+                    try await repository.addExercise(exercise)
+                } else {
+                    let trainingDay = TrainingDay(date: date)
+                    try await repository.addTrainingDay(trainingDay)
+                    let exercise = TrainingExercise(
+                        name: exerciseFormResult.name,
+                        sets: exerciseFormResult.sets,
+                        reps: exerciseFormResult.reps,
+                        rest: exerciseFormResult.rest,
+                        trainingDay: trainingDay,
+                        type: exerciseFormResult.exerciseType
+                    )
+                    try await repository.addExercise(exercise)
+                }
             } catch {
-                print("Failed to load exercises. Error: \(error)")
+                print("Failed to add default exercise. Error: \(error)")
             }
-            isLoading = false
         }
     }
 }

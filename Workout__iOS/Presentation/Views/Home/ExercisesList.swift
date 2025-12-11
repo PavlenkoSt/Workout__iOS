@@ -17,15 +17,13 @@ struct ExercisesList: View {
     var exercises: [TrainingExercise]
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(Array(exercises.enumerated()), id: \.element.id) {
-                    index,
-                    item in
-                    ExerciseItem(exercise: item, index: index)
-                }
+        LazyVStack(spacing: 8) {
+            ForEach(Array(exercises.enumerated()), id: \.element.id) {
+                index,
+                item in
+                ExerciseItem(exercise: item, index: index)
             }
-        }.padding(.horizontal, 8)
+        }
     }
 }
 

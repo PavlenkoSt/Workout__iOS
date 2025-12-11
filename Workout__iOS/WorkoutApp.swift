@@ -25,7 +25,7 @@ struct WorkoutApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView().environment(\.modelContext, container.mainContext)
-        }
+            ContentView()
+        }.modelContainer(container)
     }
 }

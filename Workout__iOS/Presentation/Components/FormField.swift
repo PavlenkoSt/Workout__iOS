@@ -1,10 +1,3 @@
-//
-//  FormField.swift
-//  Workout__iOS
-//
-//  Created by Stanislav Pavlenko on 09.12.2025.
-//
-
 import SwiftUI
 
 struct FormField: View {
@@ -14,22 +7,34 @@ struct FormField: View {
     var keyboardType: UIKeyboardType = .default
     var inputFilter: (String) -> String = { $0 }
     var onValueChange: (String) -> Void = { _ in }
-    
+
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         VStack {
-            TextField(
-                placeholder,
-                text: $text
-            )
-            .onChange(of: text) { oldValue, newValue in
-                text = inputFilter(newValue)
-                onValueChange(text)
+            ZStack(alignment: .leading) {
+                // Invisible rectangle to capture all taps
+                Rectangle()
+                    .fill(.white)
+                    .frame(minHeight: 50)
+                    .onTapGesture {
+                        isFocused = true
+                    }
+
+                TextField(
+                    placeholder,
+                    text: $text
+                )
+                .onChange(of: text) { oldValue, newValue in
+                    text = inputFilter(newValue)
+                    onValueChange(text)
+                }
+                .keyboardType(keyboardType)
+                .focused($isFocused)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 12)
             }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 12)
-            .frame(minHeight: 50)
-            .keyboardType(keyboardType)
-            .background(.white)
+            .frame(maxWidth: .infinity)
             .roundedBorder()
 
             Text(error ?? " ")
