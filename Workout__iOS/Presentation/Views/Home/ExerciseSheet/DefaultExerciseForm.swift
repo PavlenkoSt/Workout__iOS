@@ -21,7 +21,7 @@ struct DefaultExerciseForm: View {
     @State private var exerciseName: String = ""
     @State private var reps: String = ""
     @State private var sets: String = ""
-    @State private var rest: String = ""
+    @State private var rest: String = "120"
 
     // errors
     @State private var nameError: String?
@@ -45,13 +45,13 @@ struct DefaultExerciseForm: View {
             isValid = false
         }
 
-        if let setsInt = Int(reps), setsInt > 0 {
+        if let setsInt = Int(sets), setsInt > 0 {
         } else {
             setsError = "Must be > 0"
             isValid = false
         }
 
-        if let restInt = Int(reps), restInt > 0 {
+        if let restInt = Int(rest), restInt > 0 {
         } else {
             restError = "Must be > 0"
             isValid = false

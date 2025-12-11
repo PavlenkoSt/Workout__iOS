@@ -7,26 +7,21 @@
 
 import SwiftUI
 
-struct DefaultExerciseFormResult {
-    let name: String
-    let reps: Int
-    let sets: Int
-    let rest: Int
-}
-
-struct DefaultExerciseForm: View {
-    var onSubmit: (DefaultExerciseFormResult) -> Void = { _ in }
+struct LadderExerciseForm: View {
+    var onSubmit: (LadderExerciseSubmitResult) -> Void = { _ in }
 
     // fields
     @State private var exerciseName: String = ""
-    @State private var reps: String = ""
-    @State private var sets: String = ""
+    @State private var from: String = ""
+    @State private var to: String = ""
+    @State private var step: String = "1"
     @State private var rest: String = "120"
 
     // errors
     @State private var nameError: String?
-    @State private var repsError: String?
-    @State private var setsError: String?
+    @State private var fromError: String?
+    @State private var toError: String?
+    @State private var stepError: String?
     @State private var restError: String?
 
     private func validateAndSubmit() -> Bool {
@@ -39,26 +34,33 @@ struct DefaultExerciseForm: View {
             isValid = false
         }
 
-        if let repsInt = Int(reps), repsInt > 0 {
+        if let fromInt = Int(from), fromInt > 0 {
         } else {
-            repsError = "Must be > 0"
+            fromError = "Must be > 0"
             isValid = false
         }
 
-        if let setsInt = Int(reps), setsInt > 0 {
+        if let toInt = Int(to), toInt > 0 {
         } else {
-            setsError = "Must be > 0"
+            toError = "Must be > 0"
             isValid = false
         }
 
-        if let restInt = Int(reps), restInt > 0 {
+        if let stepInt = Int(step), stepInt > 0 {
+        } else {
+            stepError = "Must be > 0"
+            isValid = false
+        }
+
+        if let restInt = Int(step), restInt > 0 {
         } else {
             restError = "Must be > 0"
             isValid = false
         }
 
-        guard let repsInt = Int(reps),
-            let setsInt = Int(sets),
+        guard let fromInt = Int(from),
+            let toInt = Int(to),
+            let stepInt = Int(step),
             let restInt = Int(rest)
         else {
             return false
@@ -67,10 +69,11 @@ struct DefaultExerciseForm: View {
         // All validations passed
         if isValid {
             onSubmit(
-                DefaultExerciseFormResult(
+                LadderExerciseSubmitResult(
                     name: exerciseName,
-                    reps: repsInt,
-                    sets: setsInt,
+                    from: fromInt,
+                    to: toInt,
+                    step: stepInt,
                     rest: restInt
                 )
             )
@@ -97,35 +100,50 @@ struct DefaultExerciseForm: View {
 
             HStack(spacing: 12) {
                 FormField(
-                    placeholder: "Reps",
-                    text: $reps,
-                    error: $repsError,
+                    placeholder: "From",
+                    text: $from,
+                    error: $fromError,
                     keyboardType: .numberPad,
                     inputFilter: { $0.filter { $0.isNumber } },
                     onValueChange: { newValue in
-                        if let repsInt = Int(newValue), repsInt > 0 {
-                            repsError = nil
+                        if let fromInt = Int(newValue), fromInt > 0 {
+                            fromError = nil
                         } else if !newValue.isEmpty {
-                            repsError = "Must be > 0"
+                            fromError = "Must be > 0"
                         }
                     }
                 )
 
                 FormField(
-                    placeholder: "Sets",
-                    text: $sets,
-                    error: $setsError,
+                    placeholder: "To",
+                    text: $to,
+                    error: $toError,
                     keyboardType: .numberPad,
                     inputFilter: { $0.filter { $0.isNumber } },
                     onValueChange: { newValue in
-                        if let setsInt = Int(newValue), setsInt > 0 {
-                            setsError = nil
+                        if let toInt = Int(newValue), toInt > 0 {
+                            toError = nil
                         } else if !newValue.isEmpty {
-                            setsError = "Must be > 0"
+                            toError = "Must be > 0"
                         }
                     }
                 )
 
+                FormField(
+                    placeholder: "Step",
+                    text: $step,
+                    error: $stepError,
+                    keyboardType: .numberPad,
+                    inputFilter: { $0.filter { $0.isNumber } },
+                    onValueChange: { newValue in
+                        if let stepInt = Int(newValue), stepInt > 0 {
+                            stepError = nil
+                        } else if !newValue.isEmpty {
+                            stepError = "Must be > 0"
+                        }
+                    }
+                )
+                
                 FormField(
                     placeholder: "Rest",
                     text: $rest,

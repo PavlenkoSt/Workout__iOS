@@ -35,8 +35,15 @@ struct Home: View {
                     exerciseFormResult: result
                 )
             },
-            onSubmitLadderExercise: { result in },
-            onSubmitSimpleExercise: { result in },
+            onSubmitLadderExercise: { result in
+                viewModel.addLadderExercise(
+                    date: selectedDay,
+                    exerciseFormResult: result
+                )
+            },
+            onSubmitSimpleExercise: { result in
+
+            },
             onChangeDate: { date in selectedDay = date },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
@@ -61,6 +68,10 @@ struct HomeContent: View {
     var onChangeDate: (Date) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
 
+    var sortedExercises: [TrainingExercise] {
+        return trainingDay?.exercises.sorted(by: { $0.order < $1.order }) ?? []
+    }
+
     var body: some View {
         VStack {
             WeekSwiper(
@@ -74,7 +85,7 @@ struct HomeContent: View {
                 if !trainingDay.exercises.isEmpty {
                     ExercisesList(
                         selectedDate: selectedDate,
-                        exercises: trainingDay.exercises,
+                        exercises: sortedExercises,
                         onAddExercisePress: {
                             isShowingSheet = true
                         },
@@ -103,7 +114,10 @@ struct HomeContent: View {
                     onSubmitDefaultExercise(result)
                     isShowingSheet = false
                 },
-                onSubmitLadderExercise: onSubmitLadderExercise,
+                onSubmitLadderExercise: { result in
+                    onSubmitLadderExercise(result)
+                    isShowingSheet = false
+                },
                 onSubmitSimpleExercise: onSubmitSimpleExercise
             )
             .presentationDragIndicator(.visible).presentationDetents([

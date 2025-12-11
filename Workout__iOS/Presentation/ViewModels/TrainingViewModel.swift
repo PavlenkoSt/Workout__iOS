@@ -81,5 +81,74 @@ class TrainingViewModel: ObservableObject {
                 print("Failed to add default exercise. Error: \(error)")
             }
         }
+
+    }
+
+    func addLadderExercise(
+        date: Date,
+        exerciseFormResult: LadderExerciseSubmitResult
+    ) {
+        Task {
+            do {
+                let trainingDayExists = try? await repository.getTrainingDay(
+                    date: date
+                )
+
+                if let trainingDay = trainingDayExists {
+                    let exercises = mapLadderExercises(
+                        exerciseFormResult: exerciseFormResult,
+                        trainingDay: trainingDay
+                    )
+
+                    try await repository.addExercises(exercises)
+                } else {
+                    let trainingDay = TrainingDay(date: date)
+
+                    let exercises = mapLadderExercises(
+                        exerciseFormResult: exerciseFormResult,
+                        trainingDay: trainingDay
+                    )
+
+                    try await repository.addTrainingDay(trainingDay)
+                    try await repository.addExercises(exercises)
+                }
+            } catch {
+                print("Failed to add ladder exercise. Error: \(error)")
+            }
+        }
+    }
+
+    private func mapLadderExercises(
+        exerciseFormResult: LadderExerciseSubmitResult,
+        trainingDay: TrainingDay
+    ) -> [TrainingExercise] {
+        var exercises: [TrainingExercise] = []
+
+        let shouldIncrement = exerciseFormResult.from < exerciseFormResult.to
+
+        var current = exerciseFormResult.from
+
+        repeat {
+            exercises.append(
+                TrainingExercise(
+                    name: exerciseFormResult.name,
+                    order: exercises.count,
+                    sets: 1,
+                    reps: current,
+                    rest: exerciseFormResult.rest,
+                    trainingDay: trainingDay,
+                    type: ExerciseType.dynamic
+                )
+            )
+            if shouldIncrement {
+                current += exerciseFormResult.step
+            } else {
+                current -= exerciseFormResult.step
+            }
+
+        } while shouldIncrement
+            ? current <= exerciseFormResult.to : current >= exerciseFormResult.to
+
+        return exercises
     }
 }

@@ -27,8 +27,6 @@ struct SimpleExerciseSubmitResult {
     let exerciseType: ExerciseType
 }
 
-// TODO style it nicely
-// TODO fix keyboard flicker when changing focus on submit
 struct ExerciseSheet: View {
     var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in
     }
@@ -87,6 +85,21 @@ struct ExerciseSheet: View {
                         )
                     )
                 })
+            } else if exerciseType == ExerciseType.ladder {
+                LadderExerciseForm(
+                    onSubmit: {
+                        result in
+                        onSubmitLadderExercise(
+                            LadderExerciseSubmitResult(
+                                name: result.name,
+                                from: result.from,
+                                to: result.to,
+                                step: result.step,
+                                rest: result.rest
+                            )
+                        )
+                    }
+                )
             }
         }
         .padding(16)
