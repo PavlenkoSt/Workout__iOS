@@ -18,6 +18,10 @@ class TrainingViewModel: ObservableObject {
         self.repository = repository
     }
 
+    func setContext(_ context: ModelContext) {
+        self.repository.updateContext(context)
+    }
+
     func deleteExercise(_ exercise: TrainingExercise) {
         Task {
             do {
@@ -51,9 +55,9 @@ class TrainingViewModel: ObservableObject {
                     try await repository.addExercise(exercise)
                 } else {
                     let trainingDay = TrainingDay(date: date)
-                    
+
                     try await repository.addTrainingDay(trainingDay)
-                    
+
                     let warmup = TrainingExercise(
                         name: "Warmup",
                         sets: 1,

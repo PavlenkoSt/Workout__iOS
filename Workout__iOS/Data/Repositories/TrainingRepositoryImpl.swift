@@ -16,10 +16,16 @@ enum TrainingRepositoryError: Error {
 
 @MainActor
 final class TrainingRepositoryImpl: TrainingDayRepository {
-    let context: ModelContext
+    private var internalContext: ModelContext
+
+    var context: ModelContext { internalContext }
 
     init(context: ModelContext) {
-        self.context = context
+        self.internalContext = context
+    }
+
+    func updateContext(_ newContext: ModelContext) {
+        self.internalContext = newContext
     }
 
     func getTrainingDay(date: Date) async throws -> TrainingDay {
@@ -28,7 +34,7 @@ final class TrainingRepositoryImpl: TrainingDayRepository {
             sortBy: [SortDescriptor(\.date)]
         )
 
-        guard let dayModel = try context.fetch(descriptor).first else {
+        guard let dayModel = try internalContext.fetch(descriptor).first else {
             throw TrainingRepositoryError.notFound
         }
 
@@ -36,22 +42,27 @@ final class TrainingRepositoryImpl: TrainingDayRepository {
     }
 
     func addTrainingDay(_ trainingDay: TrainingDay) async throws {
-        context.insert(trainingDay)
-        try context.save()
+        internalContext.insert(trainingDay)
+        try internalContext.save()
     }
 
     func addExercise(_ exercise: TrainingExercise) async throws {
-        context.insert(exercise)
-        try context.save()
+        internalContext.insert(exercise)
+        try internalContext.save()
     }
 
     func deleteExercise(_ exercise: TrainingExercise) async throws {
-        context.delete(exercise)
+        // 1. Explicitly delete the model instance from the context
+        internalContext.delete(exercise)
 
+        // 2. (Optional but good practice) Remove from the in-memory array
+        //    *before* saving, to ensure the UI updates correctly
+        //    if you are observing this array.
         if let index = exercise.trainingDay.exercises.firstIndex(of: exercise) {
             exercise.trainingDay.exercises.remove(at: index)
         }
 
-        try context.save()
+        // 3. Save the changes to the persistent store.
+        try internalContext.save()
     }
 }

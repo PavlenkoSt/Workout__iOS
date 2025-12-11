@@ -16,7 +16,8 @@ struct WorkoutApp: App {
         do {
             container = try ModelContainer(
                 for: TrainingDay.self,
-                TrainingExercise.self
+                TrainingExercise.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: false)
             )
         } catch {
             fatalError("Could not initialize ModelContainer: \(error)")

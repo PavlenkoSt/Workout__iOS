@@ -19,23 +19,20 @@ struct ContentView: View {
     @State private var selectedTab: Tabs = .home
 
     @Environment(\.modelContext) private var modelContext
+
     @StateObject private var trainingViewModel: TrainingViewModel
 
     init() {
-        // we can't use @Environment in init, so we do this:
-        // create a placeholder, then actually set in body,
-        // or use a static factory. Easiest trick:
+        let tempContainer = try! ModelContainer(
+            for: TrainingDay.self,
+            TrainingExercise.self,
+            configurations: .init(isStoredInMemoryOnly: true)
+        )
+        let tempContext = ModelContext(tempContainer)
+
+        let repository = TrainingRepositoryImpl(context: tempContext)
         _trainingViewModel = StateObject(
-            wrappedValue: TrainingViewModel(
-                repository: TrainingRepositoryImpl(
-                    context: ModelContext(
-                        try! ModelContainer(
-                            for: TrainingDay.self,
-                            TrainingExercise.self
-                        )
-                    )
-                )
-            )
+            wrappedValue: TrainingViewModel(repository: repository)
         )
     }
 
@@ -55,6 +52,8 @@ struct ContentView: View {
             Tab("Presets", systemImage: "heart.fill", value: .presets) {
                 Presets()
             }
+        }.onAppear {
+            trainingViewModel.setContext(modelContext)
         }
     }
 }
