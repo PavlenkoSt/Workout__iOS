@@ -37,7 +37,10 @@ struct Home: View {
             },
             onSubmitLadderExercise: { result in },
             onSubmitSimpleExercise: { result in },
-            onChangeDate: { date in selectedDay = date }
+            onChangeDate: { date in selectedDay = date },
+            onDeleteExercise: { exercise in
+                viewModel.deleteExercise(exercise)
+            }
         )
     }
 }
@@ -56,6 +59,7 @@ struct HomeContent: View {
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
     var onChangeDate: (Date) -> Void = { _ in }
+    var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
 
     var body: some View {
         VStack {
@@ -68,19 +72,14 @@ struct HomeContent: View {
 
             if let trainingDay = trainingDay {
                 if !trainingDay.exercises.isEmpty {
-                    ScrollView {
-                        ExercisesList(
-                            selectedDate: selectedDate,
-                            exercises: trainingDay.exercises
-                        )
-
-                        Button("Add exercise", systemImage: "plus") {
+                    ExercisesList(
+                        selectedDate: selectedDate,
+                        exercises: trainingDay.exercises,
+                        onAddExercisePress: {
                             isShowingSheet = true
-                        }.buttonStyle(.glassProminent)
-
-                        Spacer().frame(height: 10)
-
-                    }.padding(.horizontal, 8)
+                        },
+                        onDeleteExercise: onDeleteExercise
+                    )
                 } else {
                     Empty(
                         text: "No exercises yet",
@@ -141,6 +140,7 @@ struct Empty: View {
         onSubmitDefaultExercise: { result in },
         onSubmitLadderExercise: { result in },
         onSubmitSimpleExercise: { result in },
-        onChangeDate: { date in }
+        onChangeDate: { date in },
+        onDeleteExercise: { item in }
     )
 }

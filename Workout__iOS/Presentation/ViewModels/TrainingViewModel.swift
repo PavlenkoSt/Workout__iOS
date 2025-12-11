@@ -18,6 +18,16 @@ class TrainingViewModel: ObservableObject {
         self.repository = repository
     }
 
+    func deleteExercise(_ exercise: TrainingExercise) {
+        Task {
+            do {
+                try await repository.deleteExercise(exercise)
+            } catch {
+                print("Failed to delete default exercise. Error: \(error)")
+            }
+        }
+    }
+
     func addDefaultExercise(
         date: Date,
         exerciseFormResult: DefaultExerciseSubmitResult
@@ -37,7 +47,7 @@ class TrainingViewModel: ObservableObject {
                         trainingDay: trainingDay,
                         type: exerciseFormResult.exerciseType
                     )
-                    
+
                     try await repository.addExercise(exercise)
                 } else {
                     let trainingDay = TrainingDay(date: date)

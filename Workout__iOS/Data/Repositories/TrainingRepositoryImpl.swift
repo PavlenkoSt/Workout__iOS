@@ -44,4 +44,14 @@ final class TrainingRepositoryImpl: TrainingDayRepository {
         context.insert(exercise)
         try context.save()
     }
+
+    func deleteExercise(_ exercise: TrainingExercise) async throws {
+        context.delete(exercise)
+
+        if let index = exercise.trainingDay.exercises.firstIndex(of: exercise) {
+            exercise.trainingDay.exercises.remove(at: index)
+        }
+
+        try context.save()
+    }
 }
