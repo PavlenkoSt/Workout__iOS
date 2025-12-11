@@ -42,7 +42,10 @@ struct Home: View {
                 )
             },
             onSubmitSimpleExercise: { result in
-
+                viewModel.addSimpleExercise(
+                    date: selectedDay,
+                    exerciseFormResult: result
+                )
             },
             onChangeDate: { date in selectedDay = date },
             onDeleteExercise: { exercise in
@@ -118,7 +121,10 @@ struct HomeContent: View {
                     onSubmitLadderExercise(result)
                     isShowingSheet = false
                 },
-                onSubmitSimpleExercise: onSubmitSimpleExercise
+                onSubmitSimpleExercise: { result in
+                    onSubmitSimpleExercise(result)
+                    isShowingSheet = false
+                }
             )
             .presentationDragIndicator(.visible).presentationDetents([
                 .height(detentHeight)

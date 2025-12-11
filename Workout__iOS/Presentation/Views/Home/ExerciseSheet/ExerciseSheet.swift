@@ -100,6 +100,13 @@ struct ExerciseSheet: View {
                         )
                     }
                 )
+            } else {
+                Button("Save") {
+                    onSubmitSimpleExercise(
+                        SimpleExerciseSubmitResult(exerciseType: exerciseType)
+                    )
+                }
+                .buttonStyle(.glassProminent)
             }
         }
         .padding(16)

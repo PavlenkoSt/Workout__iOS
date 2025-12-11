@@ -18,7 +18,7 @@ struct ExerciseItem: View {
             HStack {
                 HStack {
                     Text(String(index + 1))
-                    Text(exercise.name)
+                    Text(getExerciseName(exercise: exercise))
                 }
                 Spacer()
                 if exercise.type == .dynamic

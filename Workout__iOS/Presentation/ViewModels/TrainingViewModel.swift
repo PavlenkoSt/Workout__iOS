@@ -81,7 +81,6 @@ class TrainingViewModel: ObservableObject {
                 print("Failed to add default exercise. Error: \(error)")
             }
         }
-
     }
 
     func addLadderExercise(
@@ -103,6 +102,15 @@ class TrainingViewModel: ObservableObject {
                     try await repository.addExercises(exercises)
                 } else {
                     let trainingDay = TrainingDay(date: date)
+                    
+                    let warmup = TrainingExercise(
+                        name: "Warmup",
+                        sets: 1,
+                        reps: 1,
+                        rest: 0,
+                        trainingDay: trainingDay,
+                        type: ExerciseType.warmup
+                    )
 
                     let exercises = mapLadderExercises(
                         exerciseFormResult: exerciseFormResult,
@@ -110,10 +118,63 @@ class TrainingViewModel: ObservableObject {
                     )
 
                     try await repository.addTrainingDay(trainingDay)
+                    try await repository.addExercise(warmup)
                     try await repository.addExercises(exercises)
                 }
             } catch {
                 print("Failed to add ladder exercise. Error: \(error)")
+            }
+        }
+    }
+
+    func addSimpleExercise(
+        date: Date,
+        exerciseFormResult: SimpleExerciseSubmitResult
+    ) {
+        Task {
+            do {
+                let trainingDayExists = try? await repository.getTrainingDay(
+                    date: date
+                )
+
+                if let trainingDay = trainingDayExists {
+                    let exercise = TrainingExercise(
+                        name: "simple_exercise",
+                        sets: 1,
+                        reps: 1,
+                        rest: 1,
+                        trainingDay: trainingDay,
+                        type: exerciseFormResult.exerciseType
+                    )
+
+                    try await repository.addExercise(exercise)
+                } else {
+                    let trainingDay = TrainingDay(date: date)
+                    
+                    let warmup = TrainingExercise(
+                        name: "Warmup",
+                        sets: 1,
+                        reps: 1,
+                        rest: 0,
+                        trainingDay: trainingDay,
+                        type: ExerciseType.warmup
+                    )
+
+                    let exercise = TrainingExercise(
+                        name: "simple_exercise",
+                        sets: 1,
+                        reps: 1,
+                        rest: 1,
+                        trainingDay: trainingDay,
+                        type: exerciseFormResult.exerciseType
+                    )
+
+                    try await repository.addTrainingDay(trainingDay)
+                    try await repository.addExercise(warmup)
+                    try await repository.addExercise(exercise)
+                }
+            } catch {
+                print("Failed to add simple exercise. Error: \(error)")
             }
         }
     }
@@ -147,7 +208,8 @@ class TrainingViewModel: ObservableObject {
             }
 
         } while shouldIncrement
-            ? current <= exerciseFormResult.to : current >= exerciseFormResult.to
+            ? current <= exerciseFormResult.to
+            : current >= exerciseFormResult.to
 
         return exercises
     }

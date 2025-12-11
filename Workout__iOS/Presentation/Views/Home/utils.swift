@@ -32,3 +32,15 @@ func getTrainingDayForPreview() -> TrainingDay {
 
     return trainingDay
 }
+
+func getExerciseName(exercise: TrainingExercise) -> String {
+    if exercise.type == .flexibilitySession {
+        return "Flexibility session"
+    } else if exercise.type == .handBalanceSession {
+        return "Hand balance session"
+    } else if exercise.type == .warmup {
+        return "Warmup"
+    } else {
+        return exercise.name
+    }
+}
