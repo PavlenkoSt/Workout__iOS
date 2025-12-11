@@ -21,10 +21,17 @@ struct ExerciseItem: View {
                     Text(exercise.name)
                 }
                 Spacer()
-                HStack {
-                    StatItem(title: "Reps", value: String(exercise.reps))
-                    StatItem(title: "Sets", value: String(exercise.sets))
-                    StatItem(title: "Rest", value: "\(exercise.rest) sec.")
+                if exercise.type == .dynamic
+                    || exercise.type == .staticType
+                    || exercise.type == .ladder
+                {
+                    HStack {
+                        StatItem(title: "Reps", value: String(exercise.reps))
+                        StatItem(title: "Sets", value: String(exercise.sets))
+                        StatItem(title: "Rest", value: "\(exercise.rest) sec.")
+                    }
+                } else {
+                    Spacer().frame(height: 40)
                 }
             }
 
