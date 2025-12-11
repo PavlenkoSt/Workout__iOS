@@ -51,7 +51,17 @@ class TrainingViewModel: ObservableObject {
                     try await repository.addExercise(exercise)
                 } else {
                     let trainingDay = TrainingDay(date: date)
+                    
                     try await repository.addTrainingDay(trainingDay)
+                    
+                    let warmup = TrainingExercise(
+                        name: "Warmup",
+                        sets: 1,
+                        reps: 1,
+                        rest: 0,
+                        trainingDay: trainingDay,
+                        type: ExerciseType.warmup
+                    )
                     let exercise = TrainingExercise(
                         name: exerciseFormResult.name,
                         sets: exerciseFormResult.sets,
@@ -60,6 +70,7 @@ class TrainingViewModel: ObservableObject {
                         trainingDay: trainingDay,
                         type: exerciseFormResult.exerciseType
                     )
+                    try await repository.addExercise(warmup)
                     try await repository.addExercise(exercise)
                 }
             } catch {
