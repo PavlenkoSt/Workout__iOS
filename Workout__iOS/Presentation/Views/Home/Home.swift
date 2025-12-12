@@ -50,6 +50,12 @@ struct Home: View {
             onChangeDate: { date in selectedDay = date },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
+            },
+            onIncrementExercise: { exercise in
+                viewModel.incrementExerciseSetsDone(exercise: exercise)
+            },
+            onDecrementExercise: { exercise in
+                viewModel.decrementExerciseSetsDone(exercise: exercise)
             }
         )
     }
@@ -70,6 +76,9 @@ struct HomeContent: View {
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
     var onChangeDate: (Date) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
+
+    var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
+    var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
 
     var sortedExercises: [TrainingExercise] {
         return trainingDay?.exercises.sorted(by: { $0.order < $1.order }) ?? []
@@ -92,7 +101,9 @@ struct HomeContent: View {
                         onAddExercisePress: {
                             isShowingSheet = true
                         },
-                        onDeleteExercise: onDeleteExercise
+                        onDeleteExercise: onDeleteExercise,
+                        onIncrementExercise: onIncrementExercise,
+                        onDecrementExercise: onDecrementExercise
                     )
                 } else {
                     Empty(

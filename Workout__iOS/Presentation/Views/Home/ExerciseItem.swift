@@ -11,6 +11,9 @@ struct ExerciseItem: View {
     var exercise: TrainingExercise
     var index: Int
 
+    var onIncrement: (TrainingExercise) -> Void = { _ in }
+    var onDecrement: (TrainingExercise) -> Void = { _ in }
+
     @State private var showCheckmark = false
 
     var body: some View {
@@ -36,7 +39,10 @@ struct ExerciseItem: View {
             }
 
             HStack {
-                CounterBtn(text: "-", action: {})
+                CounterBtn(
+                    text: "-",
+                    action: { onDecrement(exercise) }
+                )
                 ZStack(alignment: .bottomTrailing) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title3)
@@ -48,7 +54,7 @@ struct ExerciseItem: View {
                     VStack {
                         Text("\(exercise.setsDone)/\(exercise.sets)")
                         ProgressView(
-                            value: Float(exercise.setsDone / exercise.sets)
+                            value: Float(exercise.setsDone) / Float(exercise.sets)
                         )
                     }.padding(.bottom, 8)
                         .onAppear(perform: {
@@ -84,7 +90,10 @@ struct ExerciseItem: View {
                         )
                 }
 
-                CounterBtn(text: "+", action: {})
+                CounterBtn(
+                    text: "+",
+                    action: { onIncrement(exercise) }
+                )
             }
         }
         .padding(.vertical, 6)
@@ -121,6 +130,7 @@ private struct CounterBtn: View {
         .background(Color.blue)
         .cornerRadius(CGFloat(8))
         .foregroundStyle(.white)
+        .buttonStyle(.borderless)
     }
 }
 

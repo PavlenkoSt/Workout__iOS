@@ -102,7 +102,7 @@ class TrainingViewModel: ObservableObject {
                     try await repository.addExercises(exercises)
                 } else {
                     let trainingDay = TrainingDay(date: date)
-                    
+
                     let warmup = TrainingExercise(
                         name: "Warmup",
                         sets: 1,
@@ -150,7 +150,7 @@ class TrainingViewModel: ObservableObject {
                     try await repository.addExercise(exercise)
                 } else {
                     let trainingDay = TrainingDay(date: date)
-                    
+
                     let warmup = TrainingExercise(
                         name: "Warmup",
                         sets: 1,
@@ -175,6 +175,33 @@ class TrainingViewModel: ObservableObject {
                 }
             } catch {
                 print("Failed to add simple exercise. Error: \(error)")
+            }
+        }
+    }
+
+    func incrementExerciseSetsDone(exercise: TrainingExercise) {
+        Task {
+            do {
+                withAnimation(.bouncy(duration: 0.2)) {
+                    exercise.setsDone += 1
+                }
+                try await repository.updateExercise(exercise)
+            } catch {
+                print("Failed to increment exercise sets done. Error: \(error)")
+            }
+        }
+    }
+
+    func decrementExerciseSetsDone(exercise: TrainingExercise) {
+        Task {
+            do {
+                guard exercise.setsDone > 0 else { return }
+                withAnimation(.bouncy(duration: 0.2)) {
+                    exercise.setsDone -= 1
+                }
+                try await repository.updateExercise(exercise)
+            } catch {
+                print("Failed to increment exercise sets done. Error: \(error)")
             }
         }
     }

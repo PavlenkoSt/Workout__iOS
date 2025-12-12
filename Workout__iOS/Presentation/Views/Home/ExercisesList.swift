@@ -15,25 +15,34 @@ struct CustomListData: Identifiable {
 struct ExercisesList: View {
     let selectedDate: Date
     var exercises: [TrainingExercise]
+
     var onAddExercisePress: () -> Void = {}
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
+
+    var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
+    var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
 
     var body: some View {
         List {
             ForEach(Array(exercises.enumerated()), id: \.element.id) {
                 index,
                 item in
-                ExerciseItem(exercise: item, index: index)
-                    .swipeActions(
-                        edge: .trailing,
-                        allowsFullSwipe: false
-                    ) {
-                        Button(role: .destructive) {
-                            onDeleteExercise(item)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
+                ExerciseItem(
+                    exercise: item,
+                    index: index,
+                    onIncrement: onIncrementExercise,
+                    onDecrement: onDecrementExercise
+                )
+                .swipeActions(
+                    edge: .trailing,
+                    allowsFullSwipe: false
+                ) {
+                    Button(role: .destructive) {
+                        onDeleteExercise(item)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
+                }
             }
 
             VStack {
