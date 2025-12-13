@@ -67,12 +67,6 @@ struct Home: View {
             },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
-            },
-            onIncrementExercise: { exercise in
-                viewModel.incrementExerciseSetsDone(exercise: exercise)
-            },
-            onDecrementExercise: { exercise in
-                viewModel.decrementExerciseSetsDone(exercise: exercise)
             }
         )
     }
@@ -96,9 +90,6 @@ struct HomeContent: View {
 
     var onDeleteTrainingDay: (TrainingDay) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
-
-    var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
-    var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
 
     var sortedExercises: [TrainingExercise] {
         return trainingDay?.exercises.sorted(by: { $0.order < $1.order }) ?? []
@@ -135,9 +126,7 @@ struct HomeContent: View {
                         onUpdateExercise: { exercise in
                             exerciseToEdit = exercise
                             isShowingSheet = true
-                        },
-                        onIncrementExercise: onIncrementExercise,
-                        onDecrementExercise: onDecrementExercise
+                        }
                     )
                 } else {
                     Empty(

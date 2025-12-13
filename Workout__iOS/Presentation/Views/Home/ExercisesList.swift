@@ -20,8 +20,29 @@ struct ExercisesList: View {
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
     var onUpdateExercise: (TrainingExercise) -> Void = { _ in }
 
-    var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
-    var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
+    private func handleMove(from source: IndexSet, to destination: Int) {
+        var mutableExercises = Array(exercises)  // Create a mutable copy of the fetched results
+        mutableExercises.move(fromOffsets: source, toOffset: destination)
+
+        for (newIndex, exercise) in mutableExercises.enumerated() {
+            if exercise.order != newIndex {
+                exercise.order = newIndex
+            }
+        }
+    }
+
+    private func incrementExercise(exercise: TrainingExercise) {
+        withAnimation(.bouncy(duration: 0.2)) {
+            exercise.setsDone += 1
+        }
+    }
+
+    private func decrementExercise(exercise: TrainingExercise) {
+        guard exercise.setsDone > 0 else { return }
+        withAnimation(.bouncy(duration: 0.2)) {
+            exercise.setsDone -= 1
+        }
+    }
 
     var body: some View {
         List {
@@ -31,8 +52,8 @@ struct ExercisesList: View {
                 ExerciseItem(
                     exercise: item,
                     index: index,
-                    onIncrement: onIncrementExercise,
-                    onDecrement: onDecrementExercise
+                    onIncrement: incrementExercise,
+                    onDecrement: decrementExercise
                 )
                 .swipeActions(
                     edge: .trailing,
@@ -54,7 +75,7 @@ struct ExercisesList: View {
                         Label("Edit", systemImage: "square.and.pencil")
                     }.tint(.blue)
                 }
-            }
+            }.onMove(perform: handleMove)
 
             Button(action: onAddExercisePress) {
                 HStack(spacing: 6) {

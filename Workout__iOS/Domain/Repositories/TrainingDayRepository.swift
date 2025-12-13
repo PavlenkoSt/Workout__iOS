@@ -11,6 +11,7 @@ protocol TrainingDayRepository {
     func getTrainingDay(date: Date) async throws -> TrainingDay
     func deleteTrainingDay(trainingDay: TrainingDay) async throws
     func addTrainingDay(_ trainingDay: TrainingDay) async throws
+    func deleteExercise(_ exercise: TrainingExercise) async throws
     func addExercise(_ exercise: TrainingExercise) async throws
-    func updateExercise(_ exercise: TrainingExercise) async throws
+    func addExercises(_ exercises: [TrainingExercise]) async throws
 }

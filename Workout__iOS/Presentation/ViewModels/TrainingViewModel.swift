@@ -189,33 +189,6 @@ class TrainingViewModel: ObservableObject {
         }
     }
 
-    func incrementExerciseSetsDone(exercise: TrainingExercise) {
-        Task {
-            do {
-                withAnimation(.bouncy(duration: 0.2)) {
-                    exercise.setsDone += 1
-                }
-                try await repository.updateExercise(exercise)
-            } catch {
-                print("Failed to increment exercise sets done. Error: \(error)")
-            }
-        }
-    }
-
-    func decrementExerciseSetsDone(exercise: TrainingExercise) {
-        Task {
-            do {
-                guard exercise.setsDone > 0 else { return }
-                withAnimation(.bouncy(duration: 0.2)) {
-                    exercise.setsDone -= 1
-                }
-                try await repository.updateExercise(exercise)
-            } catch {
-                print("Failed to increment exercise sets done. Error: \(error)")
-            }
-        }
-    }
-
     func updateDefaultExercise(
         exerciseToEdit: TrainingExercise,
         exerciseFormResult: DefaultExerciseSubmitResult
@@ -225,14 +198,6 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = exerciseFormResult.sets
         exerciseToEdit.rest = exerciseFormResult.rest
         exerciseToEdit.type = exerciseFormResult.exerciseType
-
-        Task {
-            do {
-                try await repository.updateExercise(exerciseToEdit)
-            } catch {
-                print("Failed to update default exercise. Error: \(error)")
-            }
-        }
     }
 
     func updateSimpleExercise(
@@ -244,14 +209,6 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = 1
         exerciseToEdit.rest = 1
         exerciseToEdit.type = exerciseFormResult.exerciseType
-
-        Task {
-            do {
-                try await repository.updateExercise(exerciseToEdit)
-            } catch {
-                print("Failed to update simple exercise. Error: \(error)")
-            }
-        }
     }
 
     private func mapLadderExercises(
