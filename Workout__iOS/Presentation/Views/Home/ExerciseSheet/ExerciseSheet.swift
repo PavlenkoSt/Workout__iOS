@@ -23,6 +23,11 @@ struct LadderExerciseSubmitResult {
     let rest: Int
 }
 
+struct ExerciseFormSeed {
+    var name: String? = ""
+    var reps: String? = ""
+}
+
 struct SimpleExerciseSubmitResult {
     let exerciseType: ExerciseType
 }
@@ -34,6 +39,7 @@ struct ExerciseSheet: View {
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
     @State private var exerciseType: ExerciseType = .dynamic
+    @State private var savedSeed: ExerciseFormSeed = ExerciseFormSeed()
 
     var body: some View {
         VStack {
@@ -74,17 +80,20 @@ struct ExerciseSheet: View {
             if exerciseType == ExerciseType.dynamic
                 || exerciseType == ExerciseType.staticType
             {
-                DefaultExerciseForm(onSubmit: { result in
-                    onSubmitDefaultExercise(
-                        DefaultExerciseSubmitResult(
-                            exerciseType: exerciseType,
-                            name: result.name,
-                            reps: result.reps,
-                            sets: result.sets,
-                            rest: result.rest
+                DefaultExerciseForm(
+                    onSubmit: { result in
+                        onSubmitDefaultExercise(
+                            DefaultExerciseSubmitResult(
+                                exerciseType: exerciseType,
+                                name: result.name,
+                                reps: result.reps,
+                                sets: result.sets,
+                                rest: result.rest
+                            )
                         )
-                    )
-                })
+                    },
+                    savedSeed: $savedSeed
+                )
             } else if exerciseType == ExerciseType.ladder {
                 LadderExerciseForm(
                     onSubmit: {
@@ -98,7 +107,8 @@ struct ExerciseSheet: View {
                                 rest: result.rest
                             )
                         )
-                    }
+                    },
+                    savedSeed: $savedSeed
                 )
             } else {
                 Button("Save") {
@@ -107,6 +117,9 @@ struct ExerciseSheet: View {
                     )
                 }
                 .buttonStyle(.glassProminent)
+                .onAppear {
+                    savedSeed = ExerciseFormSeed()
+                }
             }
         }
         .padding(16)

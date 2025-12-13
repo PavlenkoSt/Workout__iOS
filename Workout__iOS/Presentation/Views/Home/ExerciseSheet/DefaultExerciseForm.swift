@@ -16,6 +16,8 @@ struct DefaultExerciseFormResult {
 
 struct DefaultExerciseForm: View {
     var onSubmit: (DefaultExerciseFormResult) -> Void = { _ in }
+    
+    @Binding var savedSeed: ExerciseFormSeed
 
     // fields
     @State private var exerciseName: String = ""
@@ -92,6 +94,7 @@ struct DefaultExerciseForm: View {
                     } else {
                         nameError = nil
                     }
+                    savedSeed.name = newValue
                 }
             )
 
@@ -108,6 +111,7 @@ struct DefaultExerciseForm: View {
                         } else if !newValue.isEmpty {
                             repsError = "Must be > 0"
                         }
+                        savedSeed.reps = newValue
                     }
                 )
 
@@ -144,10 +148,22 @@ struct DefaultExerciseForm: View {
 
             Button("Save") { validateAndSubmit() }
                 .buttonStyle(.glassProminent)
+        }.onAppear {
+            if let savedName = savedSeed.name {
+                exerciseName = savedName
+            }
+
+            if let savedReps = savedSeed.reps {
+                reps = savedReps
+            }
         }
     }
 }
 
 #Preview {
-    DefaultExerciseForm()
+    @State var seed = ExerciseFormSeed()
+
+    DefaultExerciseForm(
+        savedSeed: $seed
+    )
 }

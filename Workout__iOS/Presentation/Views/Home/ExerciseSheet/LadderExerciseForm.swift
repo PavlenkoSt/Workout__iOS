@@ -10,6 +10,8 @@ import SwiftUI
 struct LadderExerciseForm: View {
     var onSubmit: (LadderExerciseSubmitResult) -> Void = { _ in }
 
+    @Binding var savedSeed: ExerciseFormSeed
+
     // fields
     @State private var exerciseName: String = ""
     @State private var from: String = ""
@@ -143,7 +145,7 @@ struct LadderExerciseForm: View {
                         }
                     }
                 )
-                
+
                 FormField(
                     placeholder: "Rest",
                     text: $rest,
@@ -162,10 +164,23 @@ struct LadderExerciseForm: View {
 
             Button("Save") { validateAndSubmit() }
                 .buttonStyle(.glassProminent)
+        }.onAppear {
+            if let savedName = savedSeed.name {
+                exerciseName = savedName
+            }
+
+            if let savedReps = savedSeed.reps {
+                from = savedReps
+            }
         }
     }
 }
 
 #Preview {
-    DefaultExerciseForm()
+    @State var seed: ExerciseFormSeed = ExerciseFormSeed()
+
+    DefaultExerciseForm(
+        onSubmit: { _ in },
+        savedSeed: $seed
+    )
 }
