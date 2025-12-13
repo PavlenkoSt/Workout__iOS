@@ -62,6 +62,9 @@ struct Home: View {
                     )
                 }
             },
+            onDeleteTrainingDay: { trainingDay in
+                viewModel.deleteTrainingDay(trainingDay: trainingDay)
+            },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
             },
@@ -91,6 +94,7 @@ struct HomeContent: View {
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
+    var onDeleteTrainingDay: (TrainingDay) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
 
     var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
@@ -104,7 +108,20 @@ struct HomeContent: View {
         VStack {
             WeekSwiper(selectedDate: $selectedDate)
 
-            TrainingDayHeader(selectedDate: selectedDate)
+            if let trainingDay = trainingDay {
+                Menu {
+                    Button(
+                        role: .destructive,
+                        action: { onDeleteTrainingDay(trainingDay) }
+                    ) {
+                        Label("Delete training day", systemImage: "trash")
+                    }
+                } label: {
+                    TrainingDayHeader(selectedDate: selectedDate)
+                }
+            } else {
+                TrainingDayHeader(selectedDate: selectedDate)
+            }
 
             if let trainingDay = trainingDay {
                 if !trainingDay.exercises.isEmpty {
@@ -193,9 +210,5 @@ struct Empty: View {
         selectedDate: $selectedDate,
         isLoading: false,
         trainingDay: nil,
-        onSubmitDefaultExercise: { result in },
-        onSubmitLadderExercise: { result in },
-        onSubmitSimpleExercise: { result in },
-        onDeleteExercise: { item in }
     )
 }

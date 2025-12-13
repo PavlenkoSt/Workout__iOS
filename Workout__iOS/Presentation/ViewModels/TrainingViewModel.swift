@@ -127,6 +127,16 @@ class TrainingViewModel: ObservableObject {
         }
     }
 
+    func deleteTrainingDay(trainingDay: TrainingDay) {
+        Task {
+            do {
+                try await repository.deleteTrainingDay(trainingDay: trainingDay)
+            } catch {
+                print("Failed to delete training day. Error: \(error)")
+            }
+        }
+    }
+
     func addSimpleExercise(
         date: Date,
         exerciseFormResult: SimpleExerciseSubmitResult
@@ -224,7 +234,7 @@ class TrainingViewModel: ObservableObject {
             }
         }
     }
-    
+
     func updateSimpleExercise(
         exerciseToEdit: TrainingExercise,
         exerciseFormResult: SimpleExerciseSubmitResult
@@ -234,7 +244,7 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = 1
         exerciseToEdit.rest = 1
         exerciseToEdit.type = exerciseFormResult.exerciseType
-        
+
         Task {
             do {
                 try await repository.updateExercise(exerciseToEdit)

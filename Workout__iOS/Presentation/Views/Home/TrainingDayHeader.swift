@@ -21,6 +21,7 @@ struct TrainingDayHeader: View {
             .font(Font.title)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 16)
+            .foregroundStyle(.black)
     }
 }
 

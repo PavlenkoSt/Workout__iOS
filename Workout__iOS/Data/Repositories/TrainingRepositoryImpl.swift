@@ -45,6 +45,11 @@ final class TrainingRepositoryImpl: TrainingDayRepository {
         internalContext.insert(trainingDay)
         try internalContext.save()
     }
+    
+    func deleteTrainingDay(trainingDay: TrainingDay) async throws {
+        internalContext.delete(trainingDay)
+        try internalContext.save()
+    }
 
     func addExercise(_ exercise: TrainingExercise) async throws {
         internalContext.insert(exercise)
