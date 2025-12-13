@@ -45,17 +45,17 @@ struct ExercisesList: View {
                 }
             }
 
-            VStack {
-                HStack {
-                    Spacer()
-                    Button("Add exercise", systemImage: "plus") {
-                        onAddExercisePress()
-                    }.buttonStyle(.glassProminent)
-                    Spacer()
+            Button(action: onAddExercisePress) {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus")
+                    Text("Add exercise")
                 }
-
-                Spacer().frame(height: 10)
             }
+            .foregroundStyle(.white)
+            .buttonStyle(.glassProminent)
+            .frame(maxWidth: .infinity)
+            .listRowSeparator(.hidden)
+
         }.listStyle(.inset)
     }
 }
