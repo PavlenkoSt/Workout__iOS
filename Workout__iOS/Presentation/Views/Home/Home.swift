@@ -25,7 +25,7 @@ struct Home: View {
 
     var body: some View {
         HomeContent(
-            selectedDate: selectedDay,
+            selectedDate: $selectedDay,
             isLoading: false,
             trainingDay: trainingDay,
             onSubmitDefaultExercise: {
@@ -47,7 +47,6 @@ struct Home: View {
                     exerciseFormResult: result
                 )
             },
-            onChangeDate: { date in selectedDay = date },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
             },
@@ -65,7 +64,7 @@ struct HomeContent: View {
     @State private var isShowingSheet = false
     @State private var detentHeight: CGFloat = 0
 
-    var selectedDate: Date
+    @Binding var selectedDate: Date
     var isLoading: Bool
     var trainingDay: TrainingDay?
 
@@ -74,9 +73,8 @@ struct HomeContent: View {
     }
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
-    var onChangeDate: (Date) -> Void = { _ in }
-    var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
 
+    var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
     var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
     var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
 
@@ -86,10 +84,7 @@ struct HomeContent: View {
 
     var body: some View {
         VStack {
-            WeekSwiper(
-                selectedDate: selectedDate,
-                onSelectDate: onChangeDate
-            )
+            WeekSwiper(selectedDate: $selectedDate)
 
             TrainingDayHeader(selectedDate: selectedDate)
 
@@ -162,16 +157,17 @@ struct Empty: View {
 }
 
 #Preview {
+    @Previewable @State var selectedDate = Date()
+    
     let trainingDay = getTrainingDayForPreview()
-
+    
     HomeContent(
-        selectedDate: Date(),
+        selectedDate: $selectedDate,
         isLoading: false,
         trainingDay: nil,
         onSubmitDefaultExercise: { result in },
         onSubmitLadderExercise: { result in },
         onSubmitSimpleExercise: { result in },
-        onChangeDate: { date in },
         onDeleteExercise: { item in }
     )
 }

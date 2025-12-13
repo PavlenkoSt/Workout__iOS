@@ -177,7 +177,7 @@ struct LadderExerciseForm: View {
 }
 
 #Preview {
-    @State var seed: ExerciseFormSeed = ExerciseFormSeed()
+    @Previewable @State var seed: ExerciseFormSeed = ExerciseFormSeed()
 
     DefaultExerciseForm(
         onSubmit: { _ in },

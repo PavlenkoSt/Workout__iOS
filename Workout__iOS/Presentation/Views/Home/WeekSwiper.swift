@@ -3,8 +3,7 @@ import SwiftUI
 struct WeekSwiper: View {
     @State private var currentWeekOffset = 0
 
-    let selectedDate: Date
-    let onSelectDate: (Date) -> Void
+    @Binding var selectedDate: Date
 
     var body: some View {
         VStack(spacing: 4) {
@@ -43,7 +42,7 @@ struct WeekSwiper: View {
                             DayCard(
                                 day: day,
                                 isSelected: isDateSelected(day.date),
-                                onSelectDate: onSelectDate
+                                onSelectDate: { date in selectedDate = date }
                             )
                         }
                     }
@@ -62,12 +61,12 @@ struct WeekSwiper: View {
 
         // If viewing current week (offset = 0), select today
         if currentWeekOffset == 0 {
-            onSelectDate(today)
+            selectedDate = today
         } else {
             // Otherwise, select Monday of the viewed week
             let monday = getMondayOfWeek(weekOffset: currentWeekOffset)
                 .startOfDay
-            onSelectDate(monday)
+            selectedDate = monday
         }
     }
 
@@ -196,5 +195,6 @@ struct DayCard: View {
 }
 
 #Preview {
-    WeekSwiper(selectedDate: Date(), onSelectDate: { _ in })
+    @Previewable @State var selectedDate = Date()
+    WeekSwiper(selectedDate: $selectedDate)
 }

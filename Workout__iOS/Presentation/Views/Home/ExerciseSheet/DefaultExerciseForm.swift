@@ -161,7 +161,7 @@ struct DefaultExerciseForm: View {
 }
 
 #Preview {
-    @State var seed = ExerciseFormSeed()
+    @Previewable @State var seed = ExerciseFormSeed()
 
     DefaultExerciseForm(
         savedSeed: $seed
