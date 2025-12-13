@@ -18,6 +18,7 @@ struct ExercisesList: View {
 
     var onAddExercisePress: () -> Void = {}
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
+    var onUpdateExercise: (TrainingExercise) -> Void = { _ in }
 
     var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
     var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
@@ -42,6 +43,16 @@ struct ExercisesList: View {
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
+                }
+                .swipeActions(
+                    edge: .leading,
+                    allowsFullSwipe: false
+                ) {
+                    Button {
+                        onUpdateExercise(item)
+                    } label: {
+                        Label("Edit", systemImage: "square.and.pencil")
+                    }.tint(.blue)
                 }
             }
 

@@ -10,6 +10,8 @@ import SwiftUI
 struct LadderExerciseForm: View {
     var onSubmit: (LadderExerciseSubmitResult) -> Void = { _ in }
 
+    var saveBtnText: String
+
     @Binding var savedSeed: ExerciseFormSeed
 
     // fields
@@ -162,7 +164,7 @@ struct LadderExerciseForm: View {
                 )
             }
 
-            Button("Save") { validateAndSubmit() }
+            Button(saveBtnText) { validateAndSubmit() }
                 .buttonStyle(.glassProminent)
         }.onAppear {
             if let savedName = savedSeed.name {
@@ -181,6 +183,7 @@ struct LadderExerciseForm: View {
 
     DefaultExerciseForm(
         onSubmit: { _ in },
+        saveBtnText: "Add",
         savedSeed: $seed
     )
 }

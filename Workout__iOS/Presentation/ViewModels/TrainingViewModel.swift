@@ -206,6 +206,44 @@ class TrainingViewModel: ObservableObject {
         }
     }
 
+    func updateDefaultExercise(
+        exerciseToEdit: TrainingExercise,
+        exerciseFormResult: DefaultExerciseSubmitResult
+    ) {
+        exerciseToEdit.name = exerciseFormResult.name
+        exerciseToEdit.reps = exerciseFormResult.reps
+        exerciseToEdit.sets = exerciseFormResult.sets
+        exerciseToEdit.rest = exerciseFormResult.rest
+        exerciseToEdit.type = exerciseFormResult.exerciseType
+
+        Task {
+            do {
+                try await repository.updateExercise(exerciseToEdit)
+            } catch {
+                print("Failed to update default exercise. Error: \(error)")
+            }
+        }
+    }
+    
+    func updateSimpleExercise(
+        exerciseToEdit: TrainingExercise,
+        exerciseFormResult: SimpleExerciseSubmitResult
+    ) {
+        exerciseToEdit.name = "simple_exercise"
+        exerciseToEdit.reps = 1
+        exerciseToEdit.sets = 1
+        exerciseToEdit.rest = 1
+        exerciseToEdit.type = exerciseFormResult.exerciseType
+        
+        Task {
+            do {
+                try await repository.updateExercise(exerciseToEdit)
+            } catch {
+                print("Failed to update simple exercise. Error: \(error)")
+            }
+        }
+    }
+
     private func mapLadderExercises(
         exerciseFormResult: LadderExerciseSubmitResult,
         trainingDay: TrainingDay

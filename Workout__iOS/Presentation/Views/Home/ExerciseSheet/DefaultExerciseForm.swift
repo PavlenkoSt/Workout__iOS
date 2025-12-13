@@ -16,7 +16,10 @@ struct DefaultExerciseFormResult {
 
 struct DefaultExerciseForm: View {
     var onSubmit: (DefaultExerciseFormResult) -> Void = { _ in }
-    
+
+    var saveBtnText: String
+    var exerciseToEdit: TrainingExercise?
+
     @Binding var savedSeed: ExerciseFormSeed
 
     // fields
@@ -146,15 +149,33 @@ struct DefaultExerciseForm: View {
                 )
             }
 
-            Button("Save") { validateAndSubmit() }
+            Button(saveBtnText) { validateAndSubmit() }
                 .buttonStyle(.glassProminent)
         }.onAppear {
-            if let savedName = savedSeed.name {
+            if let exerciseToEdit = exerciseToEdit {
+                exerciseName = exerciseToEdit.name
+                reps = String(exerciseToEdit.reps)
+                sets = String(exerciseToEdit.sets)
+                rest = String(exerciseToEdit.rest)
+            }
+
+            if let savedName = savedSeed.name, savedSeed.name != "",
+               savedSeed.name != nil
+            {
                 exerciseName = savedName
             }
 
-            if let savedReps = savedSeed.reps {
+            if let savedReps = savedSeed.reps, savedSeed.reps != "",
+               savedSeed.reps != nil
+            {
                 reps = savedReps
+            }
+        }.onChange(of: exerciseToEdit) { oldValue, newValue in
+            if let exerciseToEdit = newValue {
+                exerciseName = exerciseToEdit.name
+                reps = String(exerciseToEdit.reps)
+                sets = String(exerciseToEdit.sets)
+                rest = String(exerciseToEdit.rest)
             }
         }
     }
@@ -164,6 +185,7 @@ struct DefaultExerciseForm: View {
     @Previewable @State var seed = ExerciseFormSeed()
 
     DefaultExerciseForm(
+        saveBtnText: "Add",
         savedSeed: $seed
     )
 }

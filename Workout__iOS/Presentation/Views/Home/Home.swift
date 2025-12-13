@@ -13,6 +13,7 @@ struct Home: View {
     @ObservedObject var viewModel: TrainingViewModel
 
     @State var selectedDay: Date = Date().startOfDay
+    @State var exerciseToEdit: TrainingExercise? = nil
 
     @Query var trainingDays: [TrainingDay]
 
@@ -25,15 +26,22 @@ struct Home: View {
 
     var body: some View {
         HomeContent(
+            exerciseToEdit: $exerciseToEdit,
             selectedDate: $selectedDay,
             isLoading: false,
             trainingDay: trainingDay,
-            onSubmitDefaultExercise: {
-                result in
-                viewModel.addDefaultExercise(
-                    date: selectedDay,
-                    exerciseFormResult: result
-                )
+            onSubmitDefaultExercise: { result in
+                if let exerciseToEdit = exerciseToEdit {
+                    viewModel.updateDefaultExercise(
+                        exerciseToEdit: exerciseToEdit,
+                        exerciseFormResult: result
+                    )
+                } else {
+                    viewModel.addDefaultExercise(
+                        date: selectedDay,
+                        exerciseFormResult: result
+                    )
+                }
             },
             onSubmitLadderExercise: { result in
                 viewModel.addLadderExercise(
@@ -42,10 +50,17 @@ struct Home: View {
                 )
             },
             onSubmitSimpleExercise: { result in
-                viewModel.addSimpleExercise(
-                    date: selectedDay,
-                    exerciseFormResult: result
-                )
+                if let exerciseToEdit = exerciseToEdit {
+                    viewModel.updateSimpleExercise(
+                        exerciseToEdit: exerciseToEdit,
+                        exerciseFormResult: result
+                    )
+                } else {
+                    viewModel.addSimpleExercise(
+                        date: selectedDay,
+                        exerciseFormResult: result
+                    )
+                }
             },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
@@ -64,7 +79,9 @@ struct HomeContent: View {
     @State private var isShowingSheet = false
     @State private var detentHeight: CGFloat = 0
 
+    @Binding var exerciseToEdit: TrainingExercise?
     @Binding var selectedDate: Date
+
     var isLoading: Bool
     var trainingDay: TrainingDay?
 
@@ -75,6 +92,7 @@ struct HomeContent: View {
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
+
     var onIncrementExercise: (TrainingExercise) -> Void = { _ in }
     var onDecrementExercise: (TrainingExercise) -> Void = { _ in }
 
@@ -97,6 +115,10 @@ struct HomeContent: View {
                             isShowingSheet = true
                         },
                         onDeleteExercise: onDeleteExercise,
+                        onUpdateExercise: { exercise in
+                            exerciseToEdit = exercise
+                            isShowingSheet = true
+                        },
                         onIncrementExercise: onIncrementExercise,
                         onDecrementExercise: onDecrementExercise
                     )
@@ -130,12 +152,16 @@ struct HomeContent: View {
                 onSubmitSimpleExercise: { result in
                     onSubmitSimpleExercise(result)
                     isShowingSheet = false
-                }
+                },
+                exerciseToEdit: exerciseToEdit
             )
             .presentationDragIndicator(.visible).presentationDetents([
                 .height(detentHeight)
             ])
             .readAndBindHeight(to: $detentHeight)
+            .onDisappear {
+                exerciseToEdit = nil
+            }
         }
     }
 }
@@ -158,10 +184,12 @@ struct Empty: View {
 
 #Preview {
     @Previewable @State var selectedDate = Date()
-    
+    @Previewable @State var exerciseToEdit: TrainingExercise? = nil
+
     let trainingDay = getTrainingDayForPreview()
-    
+
     HomeContent(
+        exerciseToEdit: $exerciseToEdit,
         selectedDate: $selectedDate,
         isLoading: false,
         trainingDay: nil,

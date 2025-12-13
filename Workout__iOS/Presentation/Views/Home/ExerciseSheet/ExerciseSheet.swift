@@ -38,13 +38,27 @@ struct ExerciseSheet: View {
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
+    var exerciseToEdit: TrainingExercise?
+
+    var isEditing: Bool {
+        return exerciseToEdit != nil
+    }
+
+    var saveBtnText: String {
+        if isEditing {
+            return "Update"
+        } else {
+            return "Add"
+        }
+    }
+
     @State private var exerciseType: ExerciseType = .dynamic
     @State private var savedSeed: ExerciseFormSeed = ExerciseFormSeed()
 
     var body: some View {
         VStack {
             VStack(spacing: 16) {
-                Text("Add exercise")
+                Text(isEditing ? "Update exercise" : "Add exercise")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
@@ -57,7 +71,11 @@ struct ExerciseSheet: View {
                     Picker("Exercise type", selection: $exerciseType) {
                         Text("Dynamic").tag(ExerciseType.dynamic)
                         Text("Static").tag(ExerciseType.staticType)
-                        Text("Ladder").tag(ExerciseType.ladder)
+
+                        if exerciseToEdit == nil {
+                            Text("Ladder").tag(ExerciseType.ladder)
+                        }
+
                         Text("Warmup").tag(ExerciseType.warmup)
                         Text("Handbalance session").tag(
                             ExerciseType.handBalanceSession
@@ -92,6 +110,8 @@ struct ExerciseSheet: View {
                             )
                         )
                     },
+                    saveBtnText: saveBtnText,
+                    exerciseToEdit: exerciseToEdit,
                     savedSeed: $savedSeed
                 )
             } else if exerciseType == ExerciseType.ladder {
@@ -108,10 +128,11 @@ struct ExerciseSheet: View {
                             )
                         )
                     },
-                    savedSeed: $savedSeed
+                    saveBtnText: saveBtnText,
+                    savedSeed: $savedSeed,
                 )
             } else {
-                Button("Save") {
+                Button(saveBtnText) {
                     onSubmitSimpleExercise(
                         SimpleExerciseSubmitResult(exerciseType: exerciseType)
                     )
