@@ -21,18 +21,27 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
     @StateObject private var trainingViewModel: TrainingViewModel
+    @StateObject private var goalsViewModel: GoalsViewModel
 
     init() {
         let tempContainer = try! ModelContainer(
             for: TrainingDay.self,
             TrainingExercise.self,
+            Goal.self,
             configurations: .init(isStoredInMemoryOnly: true)
         )
         let tempContext = ModelContext(tempContainer)
 
-        let repository = TrainingRepositoryImpl(context: tempContext)
+        // Training
+        let trainingRepository = TrainingRepositoryImpl(context: tempContext)
         _trainingViewModel = StateObject(
-            wrappedValue: TrainingViewModel(repository: repository)
+            wrappedValue: TrainingViewModel(repository: trainingRepository)
+        )
+
+        // Goals
+        let goalsRepository = GoalsRepositoryImpl(context: tempContext)
+        _goalsViewModel = StateObject(
+            wrappedValue: GoalsViewModel(repository: goalsRepository)
         )
     }
 
@@ -44,7 +53,9 @@ struct ContentView: View {
                 )
             }
             Tab("Goals", systemImage: "checkmark", value: .goals) {
-                Goals()
+                Goals(
+                    viewModel: goalsViewModel
+                )
             }
             Tab("Records", systemImage: "star.fill", value: .records) {
                 Records()
@@ -54,6 +65,7 @@ struct ContentView: View {
             }
         }.onAppear {
             trainingViewModel.setContext(modelContext)
+            goalsViewModel.setContext(modelContext)
         }
     }
 }

@@ -17,6 +17,7 @@ struct WorkoutApp: App {
             container = try ModelContainer(
                 for: TrainingDay.self,
                 TrainingExercise.self,
+                Goal.self,
                 configurations: ModelConfiguration(isStoredInMemoryOnly: false)
             )
         } catch {
