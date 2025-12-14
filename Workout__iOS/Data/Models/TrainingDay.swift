@@ -31,8 +31,8 @@ class TrainingDay {
         if !isCompleted {
             let calendar = Calendar.current
             let comparisonResult = calendar.compare(
-                date,
-                to: Date(),
+                Date(),
+                to: date,
                 toGranularity: .day
             )
             if comparisonResult == .orderedDescending {

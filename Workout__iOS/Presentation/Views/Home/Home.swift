@@ -30,6 +30,7 @@ struct Home: View {
             selectedDate: $selectedDay,
             isLoading: false,
             trainingDay: trainingDay,
+            trainingDays: trainingDays,
             onSubmitDefaultExercise: { result in
                 if let exerciseToEdit = exerciseToEdit {
                     viewModel.updateDefaultExercise(
@@ -81,6 +82,7 @@ struct HomeContent: View {
 
     var isLoading: Bool
     var trainingDay: TrainingDay?
+    var trainingDays: [TrainingDay]
 
     // callbacks
     var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in
@@ -97,7 +99,7 @@ struct HomeContent: View {
 
     var body: some View {
         VStack {
-            WeekSwiper(selectedDate: $selectedDate)
+            WeekSwiper(selectedDate: $selectedDate, trainingDays: trainingDays)
 
             if let trainingDay = trainingDay {
                 Menu {
@@ -202,5 +204,6 @@ struct Empty: View {
         selectedDate: $selectedDate,
         isLoading: false,
         trainingDay: nil,
+        trainingDays: []
     )
 }

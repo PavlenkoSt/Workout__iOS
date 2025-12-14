@@ -4,6 +4,7 @@ struct WeekSwiper: View {
     @State private var currentWeekOffset = 0
 
     @Binding var selectedDate: Date
+    var trainingDays: [TrainingDay]
 
     var body: some View {
         VStack(spacing: 4) {
@@ -42,7 +43,13 @@ struct WeekSwiper: View {
                             DayCard(
                                 day: day,
                                 isSelected: isDateSelected(day.date),
-                                onSelectDate: { date in selectedDate = date }
+                                onSelectDate: { date in selectedDate = date },
+                                status: trainingDays.filter {
+                                    Calendar.current.isDate(
+                                        $0.date,
+                                        inSameDayAs: day.date
+                                    )
+                                }.first?.status
                             )
                         }
                     }
@@ -167,34 +174,57 @@ struct DayCard: View {
     let day: (name: String, number: Int, isToday: Bool, date: Date)
     let isSelected: Bool
     let onSelectDate: (Date) -> Void
+    let status: TrainingDayStatus?
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(day.name)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(isSelected ? .white : .gray)
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 2) {
+                Text(day.name)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(isSelected ? .white : .gray)
 
-            Text("\(day.number)")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(isSelected ? .white : .black)
-
-            if day.isToday {
-                Text("Today")
-                    .font(.system(size: 12))
+                Text("\(day.number)")
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundColor(isSelected ? .white : .black)
+
+                if day.isToday {
+                    Text("Today")
+                        .font(.system(size: 12))
+                        .foregroundColor(isSelected ? .white : .black)
+                }
             }
-        }
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity)
-        .background(isSelected ? Color.blue : Color(.systemGray6))
-        .cornerRadius(12)
-        .onTapGesture {
-            onSelectDate(day.date)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Color.blue : Color(.systemGray6))
+            .cornerRadius(12)
+            .onTapGesture {
+                onSelectDate(day.date)
+            }
+
+            if let status = status {
+                switch status {
+                case .completed:
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.green)
+                        .offset(x: 8, y: 0)
+                case .failed:
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.red)
+                        .offset(x: 8, y: 0)
+                case .pending:
+                    Image(systemName: "circle.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.orange)
+                        .offset(x: 8, y: 0)
+                }
+            }
         }
     }
 }
 
 #Preview {
     @Previewable @State var selectedDate = Date()
-    WeekSwiper(selectedDate: $selectedDate)
+    WeekSwiper(selectedDate: $selectedDate, trainingDays: [])
 }
