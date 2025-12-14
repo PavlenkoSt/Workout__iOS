@@ -23,6 +23,7 @@ struct ContentView: View {
     @StateObject private var trainingViewModel: TrainingViewModel
     @StateObject private var goalsViewModel: GoalsViewModel
     @StateObject private var recordsViewModel: RecordsViewModel
+    @StateObject private var presetsVideModel: PresetsViewModel
 
     init() {
         let tempContainer = try! ModelContainer(
@@ -30,6 +31,8 @@ struct ContentView: View {
             TrainingExercise.self,
             Goal.self,
             RecordModel.self,
+            Preset.self,
+            PresetExercise.self,
             configurations: .init(isStoredInMemoryOnly: true)
         )
         let tempContext = ModelContext(tempContainer)
@@ -37,17 +40,25 @@ struct ContentView: View {
         let trainingRepository = TrainingRepositoryImpl(context: tempContext)
         let recordsRepository = RecordsRepositoryImpl(context: tempContext)
         let goalsRepository = GoalsRepositoryImpl(context: tempContext)
+        let presetsRepository = PresetsRepositoryImpl(context: tempContext)
 
         _trainingViewModel = StateObject(
             wrappedValue: TrainingViewModel(repository: trainingRepository)
         )
 
         _goalsViewModel = StateObject(
-            wrappedValue: GoalsViewModel(repository: goalsRepository, recordsRepository: recordsRepository)
+            wrappedValue: GoalsViewModel(
+                repository: goalsRepository,
+                recordsRepository: recordsRepository
+            )
         )
 
         _recordsViewModel = StateObject(
             wrappedValue: RecordsViewModel(repository: recordsRepository)
+        )
+
+        _presetsVideModel = StateObject(
+            wrappedValue: PresetsViewModel(repository: presetsRepository)
         )
     }
 
@@ -69,12 +80,15 @@ struct ContentView: View {
                 )
             }
             Tab("Presets", systemImage: "heart.fill", value: .presets) {
-                Presets()
+                Presets(
+                    viewModel: presetsVideModel
+                )
             }
         }.onAppear {
             trainingViewModel.setContext(modelContext)
             goalsViewModel.setContext(modelContext)
             recordsViewModel.setContext(modelContext)
+            presetsVideModel.setContext(modelContext)
         }
     }
 }

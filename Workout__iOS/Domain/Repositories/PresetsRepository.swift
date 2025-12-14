@@ -1,0 +1,15 @@
+//
+//  PresetsRepository.swift
+//  Workout__iOS
+//
+//  Created by Stanislav Pavlenko on 14.12.2025.
+//
+
+import Foundation
+
+protocol PresetsRepository {
+    func createPreset(_ preset: Preset) async throws
+    func addExerciseToPreset(_ presetExercise: PresetExercise) async throws
+    func deletePreset(_ preset: Preset) async throws
+    func deleteExerciseFromPreset(_ presetExercise: PresetExercise) async throws
+}

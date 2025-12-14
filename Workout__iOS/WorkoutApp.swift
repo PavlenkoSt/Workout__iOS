@@ -20,6 +20,8 @@ struct WorkoutApp: App {
                 TrainingExercise.self,
                 Goal.self,
                 RecordModel.self,
+                Preset.self,
+                PresetExercise.self,
                 configurations: ModelConfiguration(isStoredInMemoryOnly: false)
             )
         } catch {

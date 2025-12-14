@@ -1,23 +1,23 @@
 //
-//  TrainingExercise.swift
+//  PresetExercise.swift
 //  Workout__iOS
 //
-//  Created by Stanislav Pavlenko on 29.11.2025.
+//  Created by Stanislav Pavlenko on 14.12.2025.
 //
 
+import Foundation
 import SwiftData
 
 @Model
-class TrainingExercise {
+class PresetExercise {
     var order: Int
     var name: String
     var sets: Int
-    var setsDone: Int
     var reps: Int
     var rest: Int
     var type: ExerciseType
 
-    var trainingDay: TrainingDay
+    var preset: Preset
 
     init(
         name: String,
@@ -25,8 +25,7 @@ class TrainingExercise {
         sets: Int,
         reps: Int,
         rest: Int,
-        setsDone: Int = 0,
-        trainingDay: TrainingDay,
+        preset: Preset,
         type: ExerciseType
     ) {
         self.name = name
@@ -34,17 +33,7 @@ class TrainingExercise {
         self.rest = rest
         self.reps = reps
         self.sets = sets
-        self.setsDone = setsDone
-        self.trainingDay = trainingDay
+        self.preset = preset
         self.type = type
     }
-}
-
-enum ExerciseType: Int, Codable {
-    case dynamic
-    case staticType
-    case ladder
-    case warmup
-    case flexibilitySession
-    case handBalanceSession
 }
