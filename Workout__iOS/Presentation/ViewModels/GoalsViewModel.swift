@@ -39,6 +39,12 @@ class GoalsViewModel: ObservableObject {
         }
     }
 
+    func updateGoal(goalToUpdate: Goal, goalSubmitResult: GoalSubmitResult) {
+        goalToUpdate.targetCount = goalSubmitResult.targetCount
+        goalToUpdate.name = goalSubmitResult.name
+        goalToUpdate.unit = goalSubmitResult.units
+    }
+
     func deleteGoal(goal: Goal) {
         Task {
             do {

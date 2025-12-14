@@ -21,25 +21,39 @@ struct Goals: View {
     @Query var goals: [Goal]
 
     @State var filter: GoalsFilter = .all
+    @State var goalToUpdate: Goal? = nil
 
     var body: some View {
         GoalsContent(
             filter: $filter,
+            goalToUpdate: $goalToUpdate,
             goals: goals,
-            addGoal: { result in viewModel.addGoal(goalSubmitResult: result) },
-            deleteGoal: { goal in viewModel.deleteGoal(goal: goal) }
+            addGoal: { result in
+                viewModel.addGoal(goalSubmitResult: result)
+            },
+            updateGoal: { goalToUpdate, result in
+                viewModel.updateGoal(
+                    goalToUpdate: goalToUpdate,
+                    goalSubmitResult: result
+                )
+            },
+            deleteGoal: { goal in
+                viewModel.deleteGoal(goal: goal)
+            }
         )
     }
 }
 
 struct GoalsContent: View {
     @Binding var filter: GoalsFilter
+    @Binding var goalToUpdate: Goal?
 
     @State var isShowingSheet: Bool = false
     @State private var detentHeight: CGFloat = 0
 
     var goals: [Goal]
     var addGoal: (GoalSubmitResult) -> Void = { _ in }
+    var updateGoal: (Goal, GoalSubmitResult) -> Void = { _, _ in }
     var deleteGoal: (Goal) -> Void = { _ in }
 
     var pendingGoals: [Goal] {
@@ -86,6 +100,16 @@ struct GoalsContent: View {
                             LazyVGrid(columns: columns) {
                                 ForEach(pendingGoals) { goal in
                                     GoalItem(goal: goal).contextMenu {
+                                        Button {
+                                            goalToUpdate = goal
+                                            isShowingSheet = true
+                                        } label: {
+                                            Label(
+                                                "Update",
+                                                systemImage: "pencil"
+                                            )
+                                        }
+
                                         Button(role: .destructive) {
                                             deleteGoal(goal)
                                         } label: {
@@ -142,23 +166,33 @@ struct GoalsContent: View {
         }.sheet(isPresented: $isShowingSheet) {
             GoalSheet(
                 onSubmit: { result in
-                    addGoal(result)
+                    if let goalToUpdate = goalToUpdate {
+                        updateGoal(goalToUpdate, result)
+                    } else {
+                        addGoal(result)
+                    }
                     isShowingSheet = false
-                }
+                },
+                goalToUpdate: goalToUpdate
             )
             .presentationDragIndicator(.visible).presentationDetents([
                 .height(detentHeight)
             ])
             .readAndBindHeight(to: $detentHeight)
+            .onDisappear {
+                goalToUpdate = nil
+            }
         }
     }
 }
 
 #Preview {
     @Previewable @State var filter: GoalsFilter = .all
+    @Previewable @State var goalToUpdate: Goal? = nil
 
     GoalsContent(
         filter: $filter,
+        goalToUpdate: $goalToUpdate,
         goals: [
             Goal(name: "Test", count: 10, targetCount: 20, unit: GoalUnit.reps),
             Goal(

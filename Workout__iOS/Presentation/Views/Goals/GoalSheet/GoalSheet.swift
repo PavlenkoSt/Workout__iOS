@@ -15,6 +15,7 @@ struct GoalSubmitResult {
 
 struct GoalSheet: View {
     var onSubmit: (GoalSubmitResult) -> Void = { _ in }
+    var goalToUpdate: Goal?
 
     // fields
     @State private var name: String = ""
@@ -61,7 +62,7 @@ struct GoalSheet: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Text("Add new goal")
+            Text(goalToUpdate != nil ? "Update goal" : "Add new goal")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
@@ -113,10 +114,26 @@ struct GoalSheet: View {
 
             Spacer().frame(height: 10)
 
-            Button("Save") { validateAndSubmit() }
-                .buttonStyle(.glassProminent)
+            Button(goalToUpdate != nil ? "Update" : "Create") {
+                validateAndSubmit()
+            }
+            .buttonStyle(.glassProminent)
 
-        }.padding(10)
+        }
+        .padding(10)
+        .onAppear {
+            if let goalToUpdate = goalToUpdate {
+                name = goalToUpdate.name
+                targetCount = String(goalToUpdate.targetCount)
+                units = goalToUpdate.unit
+            }
+        }.onChange(of: goalToUpdate) { oldValue, newValue in
+            if let goalToUpdate = newValue {
+                name = goalToUpdate.name
+                targetCount = String(goalToUpdate.targetCount)
+                units = goalToUpdate.unit
+            }
+        }
     }
 }
 
