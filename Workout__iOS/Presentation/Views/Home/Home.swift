@@ -108,10 +108,13 @@ struct HomeContent: View {
                         Label("Delete training day", systemImage: "trash")
                     }
                 } label: {
-                    TrainingDayHeader(selectedDate: selectedDate)
+                    TrainingDayHeader(
+                        selectedDate: selectedDate,
+                        status: trainingDay.status
+                    )
                 }
             } else {
-                TrainingDayHeader(selectedDate: selectedDate)
+                TrainingDayHeader(selectedDate: selectedDate, status: nil)
             }
 
             if let trainingDay = trainingDay {

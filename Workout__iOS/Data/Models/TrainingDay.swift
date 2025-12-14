@@ -19,6 +19,32 @@ class TrainingDay {
     )
     var exercises: [TrainingExercise] = []
 
+    var status: TrainingDayStatus {
+        var isCompleted = true
+
+        exercises.forEach {
+            if $0.setsDone < $0.sets {
+                isCompleted = false
+            }
+        }
+
+        if !isCompleted {
+            let calendar = Calendar.current
+            let comparisonResult = calendar.compare(
+                date,
+                to: Date(),
+                toGranularity: .day
+            )
+            if comparisonResult == .orderedDescending {
+                return .failed
+            } else {
+                return .pending
+            }
+        } else {
+            return .completed
+        }
+    }
+
     init(date: Date) {
         self.date = date
     }
