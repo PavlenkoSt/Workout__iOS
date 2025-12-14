@@ -30,7 +30,7 @@ struct CounterProgress: View {
                 )
             }.padding(.bottom, 8)
                 .onAppear(perform: {
-                    if targetCount >= count {
+                    if count >= targetCount {
                         withAnimation(
                             .spring(response: 0.4, dampingFraction: 0.7)
                         ) {
@@ -39,10 +39,10 @@ struct CounterProgress: View {
                     }
                 })
                 .onChange(
-                    of: targetCount,
+                    of: count,
                     perform: {
                         newValue in
-                        if newValue >= count {
+                        if newValue >= targetCount {
                             withAnimation(
                                 .spring(
                                     response: 0.4,
@@ -51,7 +51,7 @@ struct CounterProgress: View {
                             ) {
                                 showCheckmark = true
                             }
-                        } else if newValue < count {
+                        } else if newValue < targetCount {
                             // Hide checkmark if user “rolls back”
                             withAnimation(.easeOut(duration: 0.2)) {
                                 showCheckmark = false

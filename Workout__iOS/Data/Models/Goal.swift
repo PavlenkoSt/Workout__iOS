@@ -16,7 +16,7 @@ class Goal {
     var unit: GoalUnit
 
     var status: GoalStatus {
-        return targetCount >= count ? .completed : .pending
+        return count >= targetCount ? .completed : .pending
     }
 
     init(name: String, count: Int, targetCount: Int, unit: GoalUnit) {

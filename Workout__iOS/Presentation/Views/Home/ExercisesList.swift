@@ -32,14 +32,14 @@ struct ExercisesList: View {
     }
 
     private func incrementExercise(exercise: TrainingExercise) {
-        withAnimation(.bouncy(duration: 0.2)) {
+        withAnimation(.default) {
             exercise.setsDone += 1
         }
     }
 
     private func decrementExercise(exercise: TrainingExercise) {
         guard exercise.setsDone > 0 else { return }
-        withAnimation(.bouncy(duration: 0.2)) {
+        withAnimation(.default) {
             exercise.setsDone -= 1
         }
     }

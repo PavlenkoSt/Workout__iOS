@@ -43,7 +43,9 @@ struct GoalsContent: View {
             return goals
         } else {
             return goals.filter {
-                $0.status == (filter == .completed ? .completed : .pending)
+                $0.status
+                    == (filter == .completed
+                        ? GoalStatus.completed : GoalStatus.pending)
             }
         }
     }
