@@ -60,14 +60,17 @@ struct Records: View {
             records: sortedRecords,
             sort: $sort,
             recordToUpdate: $recordToUpdate,
-            addRecord: { result in
-                viewModel.addRecord(result)
+            addRecord: { record in
+                viewModel.addRecord(record)
             },
             updateRecord: { recordToUpdate, formResult in
                 viewModel.updateRecord(
                     recordToUpdate: recordToUpdate,
                     submitedForm: formResult
                 )
+            },
+            deleteExercise: { record in
+                viewModel.deleteRecord(record)
             }
         )
     }
@@ -84,6 +87,7 @@ struct RecordsContent: View {
 
     var addRecord: (RecordModel) -> Void = { _ in }
     var updateRecord: (RecordModel, RecordSubmitResult) -> Void = { _, _ in }
+    var deleteExercise: (RecordModel) -> Void = { _ in }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -91,7 +95,27 @@ struct RecordsContent: View {
                 RecordsHeader(sort: $sort)
                 if !records.isEmpty {
                     List(records, id: \.id) { record in
-                        RecordItem(record: record)
+                        RecordItem(record: record).swipeActions(
+                            edge: .trailing,
+                            allowsFullSwipe: false
+                        ) {
+                            Button(role: .destructive) {
+                                deleteExercise(record)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .swipeActions(
+                            edge: .leading,
+                            allowsFullSwipe: false
+                        ) {
+                            Button {
+                                recordToUpdate = record
+                                isShowingSheet = true
+                            } label: {
+                                Label("Edit", systemImage: "square.and.pencil")
+                            }.tint(.blue)
+                        }
                     }
                 } else {
                     Text("No records yet")
