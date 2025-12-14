@@ -109,7 +109,7 @@ struct GoalsContent: View {
     ]
 
     @ViewBuilder
-    private func goalContextMenu(for goal: Goal) -> some View {
+    func contextMenuItems(for goal: Goal) -> some View {
         Button {
             goalToUpdate = goal
             isShowingSheet = true
@@ -117,13 +117,11 @@ struct GoalsContent: View {
             Label("Update", systemImage: "pencil")
         }
 
-        if goal.status == .completed {
-            Button {
-                moveToRecords(goal)
-            } label: {
-                Label("Move to records", systemImage: "star")
-            }
-        }
+        Button {
+            moveToRecords(goal)
+        } label: {
+            Label("Move to records", systemImage: "star")
+        }.disabled(goal.status != .completed)
 
         Button(role: .destructive) {
             deleteGoal(goal)
@@ -149,9 +147,10 @@ struct GoalsContent: View {
 
                             LazyVGrid(columns: columns) {
                                 ForEach(pendingGoals) { goal in
-                                    GoalItem(goal: goal).contextMenu {
-                                        goalContextMenu(for: goal)
-                                    }
+                                    GoalItem(goal: goal)
+                                        .contextMenu {
+                                            contextMenuItems(for: goal)
+                                        }
                                 }
                             }.padding(.horizontal)
                         }
@@ -166,9 +165,10 @@ struct GoalsContent: View {
 
                             LazyVGrid(columns: columns) {
                                 ForEach(completedGoals) { goal in
-                                    GoalItem(goal: goal).contextMenu {
-                                        goalContextMenu(for: goal)
-                                    }
+                                    GoalItem(goal: goal)
+                                        .contextMenu {
+                                            contextMenuItems(for: goal)
+                                        }
                                 }
                             }.padding(.horizontal)
                         }
