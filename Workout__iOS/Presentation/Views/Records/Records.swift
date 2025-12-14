@@ -30,8 +30,8 @@ struct Records: View {
     @Query var records: [RecordModel]
 
     @State var sort: RecordsSorting = RecordsSorting(
-        field: FieldsSort.exercise,
-        order: SortDirection.asc
+        field: FieldsSort.date,
+        order: SortDirection.desc
     )
 
     @State var recordToUpdate: RecordModel? = nil
