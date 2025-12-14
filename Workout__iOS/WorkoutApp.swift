@@ -18,6 +18,7 @@ struct WorkoutApp: App {
                 for: TrainingDay.self,
                 TrainingExercise.self,
                 Goal.self,
+                RecordModel.self,
                 configurations: ModelConfiguration(isStoredInMemoryOnly: false)
             )
         } catch {

@@ -155,12 +155,7 @@ struct GoalsContent: View {
             Button {
                 isShowingSheet = true
             } label: {
-                Image(systemName: "plus")
-                    .font(.title.weight(.semibold))
-                    .padding()
-                    .background(.blue)
-                    .foregroundColor(.white)
-                    .clipShape(Circle())
+                FloatingBtn()
             }
             .padding()
         }.sheet(isPresented: $isShowingSheet) {
