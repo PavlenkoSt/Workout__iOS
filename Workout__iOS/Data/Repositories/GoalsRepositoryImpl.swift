@@ -26,4 +26,9 @@ final class GoalsRepositoryImpl: GoalsRepository {
         internalContext.insert(goal)
         try internalContext.save()
     }
+    
+    func deleteGoal(goal: Goal) async throws {
+        internalContext.delete(goal)
+        try internalContext.save()
+    }
 }

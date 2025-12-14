@@ -9,4 +9,5 @@ import Foundation
 
 protocol GoalsRepository {
     func addGoal(goal: Goal) async throws
+    func deleteGoal(goal: Goal) async throws
 }

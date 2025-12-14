@@ -38,4 +38,16 @@ class GoalsViewModel: ObservableObject {
             }
         }
     }
+
+    func deleteGoal(goal: Goal) {
+        Task {
+            do {
+                try await self.repository.deleteGoal(goal: goal)
+            } catch {
+                print(
+                    "Error on delete goal. Error \(error.localizedDescription)"
+                )
+            }
+        }
+    }
 }

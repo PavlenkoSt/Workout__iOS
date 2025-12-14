@@ -26,7 +26,8 @@ struct Goals: View {
         GoalsContent(
             filter: $filter,
             goals: goals,
-            addGoal: { result in viewModel.addGoal(goalSubmitResult: result) }
+            addGoal: { result in viewModel.addGoal(goalSubmitResult: result) },
+            deleteGoal: { goal in viewModel.deleteGoal(goal: goal) }
         )
     }
 }
@@ -39,12 +40,13 @@ struct GoalsContent: View {
 
     var goals: [Goal]
     var addGoal: (GoalSubmitResult) -> Void = { _ in }
+    var deleteGoal: (Goal) -> Void = { _ in }
 
     var pendingGoals: [Goal] {
         if filter == .completed {
             return []
         }
-        
+
         return goals.filter {
             $0.status
                 == GoalStatus.pending
@@ -83,7 +85,16 @@ struct GoalsContent: View {
 
                             LazyVGrid(columns: columns) {
                                 ForEach(pendingGoals) { goal in
-                                    GoalItem(goal: goal)
+                                    GoalItem(goal: goal).contextMenu {
+                                        Button(role: .destructive) {
+                                            deleteGoal(goal)
+                                        } label: {
+                                            Label(
+                                                "Delete",
+                                                systemImage: "trash"
+                                            )
+                                        }
+                                    }
                                 }
                             }.padding(.horizontal)
                         }
