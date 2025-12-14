@@ -13,9 +13,14 @@ import SwiftUI
 @MainActor
 class GoalsViewModel: ObservableObject {
     private let repository: GoalsRepositoryImpl
+    private let recordsRepository: RecordsRepositoryImpl
 
-    init(repository: GoalsRepositoryImpl) {
+    init(
+        repository: GoalsRepositoryImpl,
+        recordsRepository: RecordsRepositoryImpl
+    ) {
         self.repository = repository
+        self.recordsRepository = recordsRepository
     }
 
     func setContext(_ context: ModelContext) {
@@ -56,4 +61,49 @@ class GoalsViewModel: ObservableObject {
             }
         }
     }
+
+    func moveToRecords(goal: Goal) async throws {
+        let existingRecord = self.recordsRepository
+            .getRecordByExercise(
+                goal.name
+            )
+
+        if let existingRecord = existingRecord {
+            if existingRecord.count >= goal.count {
+                throw GoalError.alreadyExists(
+                    description: "Record already exists"
+                )
+            } else {
+                existingRecord.count = goal.count
+            }
+        } else {
+            try await self.recordsRepository.addRecord(
+                RecordModel(
+                    exercise: goal.name,
+                    count: goal.count,
+                    unit: mapGoalUnitsToRecordUnits(goal.unit),
+                    date: Date()
+                )
+            )
+        }
+    }
+
+    private func mapGoalUnitsToRecordUnits(_ goalUnits: GoalUnit) -> RecordUnit
+    {
+        switch goalUnits {
+        case .km:
+            return RecordUnit.km
+        case .reps:
+            return RecordUnit.reps
+        case .min:
+            return RecordUnit.min
+        case .sec:
+            return RecordUnit.sec
+
+        }
+    }
+}
+
+enum GoalError: Error {
+    case alreadyExists(description: String)
 }

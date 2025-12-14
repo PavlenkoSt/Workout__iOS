@@ -34,20 +34,18 @@ struct ContentView: View {
         )
         let tempContext = ModelContext(tempContainer)
 
-        // Training
         let trainingRepository = TrainingRepositoryImpl(context: tempContext)
+        let recordsRepository = RecordsRepositoryImpl(context: tempContext)
+        let goalsRepository = GoalsRepositoryImpl(context: tempContext)
+
         _trainingViewModel = StateObject(
             wrappedValue: TrainingViewModel(repository: trainingRepository)
         )
 
-        // Goals
-        let goalsRepository = GoalsRepositoryImpl(context: tempContext)
         _goalsViewModel = StateObject(
-            wrappedValue: GoalsViewModel(repository: goalsRepository)
+            wrappedValue: GoalsViewModel(repository: goalsRepository, recordsRepository: recordsRepository)
         )
 
-        // Records
-        let recordsRepository = RecordsRepositoryImpl(context: tempContext)
         _recordsViewModel = StateObject(
             wrappedValue: RecordsViewModel(repository: recordsRepository)
         )

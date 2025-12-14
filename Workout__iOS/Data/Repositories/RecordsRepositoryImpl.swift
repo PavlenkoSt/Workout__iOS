@@ -31,4 +31,22 @@ final class RecordsRepositoryImpl: RecordsRepository {
         self.internalContext.delete(record)
         try self.internalContext.save()
     }
+
+    func getRecordByExercise(_ exercise: String) -> RecordModel? {
+        do {
+            let descriptor = FetchDescriptor<RecordModel>(
+                predicate: #Predicate { $0.exercise.contains(exercise) },
+                sortBy: [SortDescriptor(\.date)]
+            )
+
+            guard let dayModel = try internalContext.fetch(descriptor).first
+            else {
+                return nil
+            }
+
+            return dayModel
+        } catch {
+            return nil
+        }
+    }
 }

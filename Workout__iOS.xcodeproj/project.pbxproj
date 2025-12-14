@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4B23098A2EEF2E6A00665AB1 /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2309892EEF2E6A00665AB1 /* Toasts */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		4B611BDB2EDB26710000DCF0 /* Workout__iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Workout__iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B23098A2EEF2E6A00665AB1 /* Toasts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = Workout__iOS;
 			packageProductDependencies = (
+				4B2309892EEF2E6A00665AB1 /* Toasts */,
 			);
 			productName = Workout__iOS;
 			productReference = 4B611BDB2EDB26710000DCF0 /* Workout__iOS.app */;
@@ -95,6 +101,9 @@
 			);
 			mainGroup = 4B611BD22EDB26710000DCF0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4B2309882EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4B611BDC2EDB26710000DCF0 /* Products */;
 			projectDirPath = "";
@@ -339,6 +348,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4B2309882EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "swiftui-toasts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sunghyun-k/swiftui-toasts.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4B2309892EEF2E6A00665AB1 /* Toasts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B2309882EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "swiftui-toasts" */;
+			productName = Toasts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4B611BD32EDB26710000DCF0 /* Project object */;
 }

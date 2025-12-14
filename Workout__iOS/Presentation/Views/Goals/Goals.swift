@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Toasts
 import _SwiftData_SwiftUI
 
 enum GoalsFilter {
@@ -16,6 +17,8 @@ enum GoalsFilter {
 }
 
 struct Goals: View {
+    @Environment(\.presentToast) var presentToast
+
     @ObservedObject var viewModel: GoalsViewModel
 
     @Query var goals: [Goal]
@@ -39,6 +42,28 @@ struct Goals: View {
             },
             deleteGoal: { goal in
                 viewModel.deleteGoal(goal: goal)
+            },
+            moveToRecords: { goal in
+                Task {
+                    try await presentToast(
+                        message: "Loading...",
+                        task: {
+                            try await viewModel.moveToRecords(goal: goal)
+                        },
+                        onSuccess: { result in
+                            ToastValue(
+                                icon: Image(systemName: "checkmark.circle"),
+                                message: "Record has been added"
+                            )
+                        },
+                        onFailure: { error in
+                            ToastValue(
+                                icon: Image(systemName: "xmark.circle"),
+                                message: "This record already exists"
+                            )
+                        }
+                    )
+                }
             }
         )
     }
@@ -55,6 +80,7 @@ struct GoalsContent: View {
     var addGoal: (GoalSubmitResult) -> Void = { _ in }
     var updateGoal: (Goal, GoalSubmitResult) -> Void = { _, _ in }
     var deleteGoal: (Goal) -> Void = { _ in }
+    var moveToRecords: (Goal) -> Void = { _ in }
 
     var pendingGoals: [Goal] {
         if filter == .completed {
@@ -82,6 +108,30 @@ struct GoalsContent: View {
         GridItem(.flexible()),
     ]
 
+    @ViewBuilder
+    private func goalContextMenu(for goal: Goal) -> some View {
+        Button {
+            goalToUpdate = goal
+            isShowingSheet = true
+        } label: {
+            Label("Update", systemImage: "pencil")
+        }
+
+        if goal.status == .completed {
+            Button {
+                moveToRecords(goal)
+            } label: {
+                Label("Move to records", systemImage: "star")
+            }
+        }
+
+        Button(role: .destructive) {
+            deleteGoal(goal)
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack {
@@ -100,24 +150,7 @@ struct GoalsContent: View {
                             LazyVGrid(columns: columns) {
                                 ForEach(pendingGoals) { goal in
                                     GoalItem(goal: goal).contextMenu {
-                                        Button {
-                                            goalToUpdate = goal
-                                            isShowingSheet = true
-                                        } label: {
-                                            Label(
-                                                "Update",
-                                                systemImage: "pencil"
-                                            )
-                                        }
-
-                                        Button(role: .destructive) {
-                                            deleteGoal(goal)
-                                        } label: {
-                                            Label(
-                                                "Delete",
-                                                systemImage: "trash"
-                                            )
-                                        }
+                                        goalContextMenu(for: goal)
                                     }
                                 }
                             }.padding(.horizontal)
@@ -133,7 +166,9 @@ struct GoalsContent: View {
 
                             LazyVGrid(columns: columns) {
                                 ForEach(completedGoals) { goal in
-                                    GoalItem(goal: goal)
+                                    GoalItem(goal: goal).contextMenu {
+                                        goalContextMenu(for: goal)
+                                    }
                                 }
                             }.padding(.horizontal)
                         }

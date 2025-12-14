@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Toasts
 
 @main
 struct WorkoutApp: App {
@@ -29,6 +30,7 @@ struct WorkoutApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .installToast(position: .bottom)
         }.modelContainer(container)
     }
 }
