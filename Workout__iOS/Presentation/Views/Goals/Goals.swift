@@ -18,11 +18,14 @@ enum GoalsFilter {
 struct Goals: View {
     @ObservedObject var viewModel: GoalsViewModel
 
+    @Query var goals: [Goal]
+
     @State var filter: GoalsFilter = .all
 
     var body: some View {
         GoalsContent(
             filter: $filter,
+            goals: goals,
             addGoal: { result in viewModel.addGoal(goalSubmitResult: result) }
         )
     }
@@ -34,34 +37,81 @@ struct GoalsContent: View {
     @State var isShowingSheet: Bool = false
     @State private var detentHeight: CGFloat = 0
 
-    @Query var goals: [Goal]
-
+    var goals: [Goal]
     var addGoal: (GoalSubmitResult) -> Void = { _ in }
 
-    var filteredGoals: [Goal] {
-        if filter == .all {
-            return goals
-        } else {
-            return goals.filter {
-                $0.status
-                    == (filter == .completed
-                        ? GoalStatus.completed : GoalStatus.pending)
-            }
+    var pendingGoals: [Goal] {
+        if filter == .completed {
+            return []
+        }
+        
+        return goals.filter {
+            $0.status
+                == GoalStatus.pending
         }
     }
+
+    var completedGoals: [Goal] {
+        if filter == .pending {
+            return []
+        }
+        return goals.filter {
+            $0.status
+                == GoalStatus.completed
+        }
+    }
+
+    let columns: [GridItem] = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+    ]
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack {
                 GoalsHeader(filter: $filter)
 
-                if !filteredGoals.isEmpty {
-                    List(filteredGoals) { goal in
-                        GoalItem(goal: goal)
+                if !pendingGoals.isEmpty || !completedGoals.isEmpty {
+                    ScrollView {
+                        if !pendingGoals.isEmpty && filter != .completed {
+                            if filter == .all {
+                                Text("Pending")
+                                    .padding(12)
+                                    .frame(maxWidth: .infinity).cornerRadius(12)
+                                    .background(.gray.opacity(0.25))
+                            }
+
+                            LazyVGrid(columns: columns) {
+                                ForEach(pendingGoals) { goal in
+                                    GoalItem(goal: goal)
+                                }
+                            }.padding(.horizontal)
+                        }
+
+                        if !completedGoals.isEmpty && filter != .pending {
+                            if filter == .all {
+                                Text("Competed")
+                                    .padding(12)
+                                    .frame(maxWidth: .infinity).cornerRadius(12)
+                                    .background(.gray.opacity(0.25))
+                            }
+
+                            LazyVGrid(columns: columns) {
+                                ForEach(completedGoals) { goal in
+                                    GoalItem(goal: goal)
+                                }
+                            }.padding(.horizontal)
+                        }
                     }
                 } else {
-                    Text("No goals yet")
-                        .padding(.vertical, 30)
+                    Text(
+                        filter == .all
+                            ? "No goals yet"
+                            : filter == .completed
+                                ? "No completed goals yet"
+                                : "No pending goals yet"
+                    )
+                    .padding(.vertical, 30)
                 }
 
                 Spacer()
@@ -96,5 +146,22 @@ struct GoalsContent: View {
 #Preview {
     @Previewable @State var filter: GoalsFilter = .all
 
-    GoalsContent(filter: $filter)
+    GoalsContent(
+        filter: $filter,
+        goals: [
+            Goal(name: "Test", count: 10, targetCount: 20, unit: GoalUnit.reps),
+            Goal(
+                name: "Test 2",
+                count: 10,
+                targetCount: 20,
+                unit: GoalUnit.reps
+            ),
+            Goal(
+                name: "Test 3",
+                count: 10,
+                targetCount: 20,
+                unit: GoalUnit.reps
+            ),
+        ]
+    )
 }

@@ -38,10 +38,11 @@ struct GoalsHeader: View {
                     getGoalsFilterName(filter: filter),
                     systemImage: "arrow.uturn.down"
                 ) {}
-                    .buttonStyle(.glassProminent).frame(width: 300).padding(.vertical, 5)
+                .buttonStyle(.glassProminent).frame(width: 300).padding(
+                    .vertical,
+                    5
+                )
             }
-            
-            Divider()
         }
     }
 }
