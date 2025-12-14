@@ -204,20 +204,26 @@ struct DayCard: View {
             if let status = status {
                 switch status {
                 case .completed:
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: "checkmark.circle")
                         .font(.title3)
-                        .foregroundColor(.green)
-                        .offset(x: 8, y: 0)
+                        .foregroundColor(.white)
+                        .background(.green)
+                        .clipShape(.circle)
+                        .offset(x: 4, y: -8)
                 case .failed:
-                    Image(systemName: "xmark.circle.fill")
+                    Image(systemName: "xmark.circle")
                         .font(.title3)
-                        .foregroundColor(.red)
-                        .offset(x: 8, y: 0)
+                        .foregroundColor(.white)
+                        .background(.orange)
+                        .clipShape(.circle)
+                        .offset(x: 4, y: -8)
                 case .pending:
-                    Image(systemName: "circle.circle.fill")
+                    Image(systemName: "circle.circle")
                         .font(.title3)
-                        .foregroundColor(.orange)
-                        .offset(x: 8, y: 0)
+                        .foregroundColor(.white)
+                        .background(.red)
+                        .clipShape(.circle)
+                        .offset(x: 4, y: -8)
                 }
             }
         }
