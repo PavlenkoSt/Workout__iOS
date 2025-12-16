@@ -21,7 +21,7 @@ class PresetExercise {
 
     init(
         name: String,
-        order: Int = 0,
+        order: Int,
         sets: Int,
         reps: Int,
         rest: Int,

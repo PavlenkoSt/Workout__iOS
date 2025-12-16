@@ -11,7 +11,10 @@ import SwiftUI
 struct Presets: View {
     @ObservedObject var viewModel: PresetsViewModel
 
-    @Query var presets: [Preset]
+    @Query(
+        sort: \Preset.createdAt,
+        order: .reverse
+    ) var presets: [Preset]
 
     var body: some View {
         PresetsContent(
