@@ -11,10 +11,7 @@ import SwiftUI
 struct Presets: View {
     @ObservedObject var viewModel: PresetsViewModel
 
-    @Query(
-        sort: \Preset.createdAt,
-        order: .reverse
-    ) var presets: [Preset]
+    @Query(sort: [SortDescriptor(\Preset.order)]) var presets: [Preset]
 
     var body: some View {
         PresetsContent(
@@ -30,6 +27,9 @@ struct Presets: View {
             },
             deletePreset: { preset in
                 viewModel.deletePreset(preset: preset)
+            },
+            updatePresetOrder: { reorderedPresets in
+                viewModel.updatePresetOrder(presets: reorderedPresets)
             }
         )
     }
@@ -60,9 +60,23 @@ struct PresetsContent: View {
             $0.name.localizedCaseInsensitiveContains(searchText)
         }
     }
+    var updatePresetOrder: ([Preset]) -> Void = { _ in }
+
+    private func handleMove(from source: IndexSet, to destination: Int) {
+        var mutablePresets = presetsWithSearch
+
+        mutablePresets.move(fromOffsets: source, toOffset: destination)
+
+        for (newIndex, preset) in mutablePresets.enumerated() {
+            if preset.order != newIndex {
+                preset.order = newIndex
+            }
+        }
+
+        updatePresetOrder(mutablePresets)
+    }
 
     var body: some View {
-
         ZStack(alignment: .bottomTrailing) {
             GeometryReader { geometry in
                 VStack {
@@ -70,31 +84,35 @@ struct PresetsContent: View {
                         searchText: $searchText
                     )
                     if !presetsWithSearch.isEmpty {
-                        List(presetsWithSearch) { preset in
-                            PresetItem(preset: preset).swipeActions(
-                                edge: .trailing,
-                                allowsFullSwipe: false
-                            ) {
-                                Button(role: .destructive) {
-                                    deletePreset(preset)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
+                        List {
+                            ForEach(presetsWithSearch) {
+                                preset in
+
+                                PresetItem(preset: preset).swipeActions(
+                                    edge: .trailing,
+                                    allowsFullSwipe: false
+                                ) {
+                                    Button(role: .destructive) {
+                                        deletePreset(preset)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
                                 }
-                            }
-                            .swipeActions(
-                                edge: .leading,
-                                allowsFullSwipe: false
-                            ) {
-                                Button {
-                                    presetToUpdate = preset
-                                    isShowingSheet = true
-                                } label: {
-                                    Label(
-                                        "Edit",
-                                        systemImage: "square.and.pencil"
-                                    )
-                                }.tint(.blue)
-                            }
+                                .swipeActions(
+                                    edge: .leading,
+                                    allowsFullSwipe: false
+                                ) {
+                                    Button {
+                                        presetToUpdate = preset
+                                        isShowingSheet = true
+                                    } label: {
+                                        Label(
+                                            "Edit",
+                                            systemImage: "square.and.pencil"
+                                        )
+                                    }.tint(.blue)
+                                }
+                            }.onMove(perform: handleMove)
                         }
                     } else {
                         Text(

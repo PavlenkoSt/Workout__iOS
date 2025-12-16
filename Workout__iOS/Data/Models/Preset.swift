@@ -11,7 +11,7 @@ import SwiftData
 @Model
 class Preset {
     var name: String
-    var createdAt: Date
+    var order: Int
 
     @Relationship(
         deleteRule: .cascade,
@@ -19,8 +19,8 @@ class Preset {
     )
     var exercises: [PresetExercise] = []
 
-    init(name: String, createdAt: Date = .now) {
+    init(name: String, order: Int = 0) {
         self.name = name
-        self.createdAt = createdAt
+        self.order = order
     }
 }

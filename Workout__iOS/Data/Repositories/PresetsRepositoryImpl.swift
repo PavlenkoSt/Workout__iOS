@@ -22,6 +22,11 @@ final class PresetsRepositoryImpl: PresetsRepository {
         self.internalContext = newContext
     }
 
+    func getPresets() async throws -> [Preset] {
+        let descriptor = FetchDescriptor<Preset>()
+        return try self.internalContext.fetch(descriptor)
+    }
+
     func createPreset(_ preset: Preset) async throws {
         self.internalContext.insert(preset)
         try self.internalContext.save()
@@ -37,8 +42,13 @@ final class PresetsRepositoryImpl: PresetsRepository {
         try self.internalContext.save()
     }
 
-    func deleteExerciseFromPreset(_ presetExercise: PresetExercise) async throws {
+    func deleteExerciseFromPreset(_ presetExercise: PresetExercise) async throws
+    {
         self.internalContext.delete(presetExercise)
+        try self.internalContext.save()
+    }
+
+    func save() async throws {
         try self.internalContext.save()
     }
 }

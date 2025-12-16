@@ -19,7 +19,7 @@ struct PresetItem: View {
 #Preview {
     PresetItem(
         preset: Preset(
-            name: "Hardcore training",
+            name: "Hardcore training"
         )
     )
 }
