@@ -24,6 +24,10 @@ struct Home: View {
         return result
     }
 
+    var exercises: [TrainingExercise] {
+        return trainingDay?.exercises.sorted(by: { $0.order < $1.order }) ?? []
+    }
+
     var body: some View {
         HomeContent(
             exerciseToEdit: $exerciseToEdit,
@@ -31,6 +35,7 @@ struct Home: View {
             isLoading: false,
             trainingDay: trainingDay,
             trainingDays: trainingDays,
+            exercises: exercises,
             onSubmitDefaultExercise: { result in
                 if let exerciseToEdit = exerciseToEdit {
                     viewModel.updateDefaultExercise(
@@ -83,6 +88,7 @@ struct HomeContent: View {
     var isLoading: Bool
     var trainingDay: TrainingDay?
     var trainingDays: [TrainingDay]
+    var exercises: [TrainingExercise]
 
     // callbacks
     var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in
@@ -92,10 +98,6 @@ struct HomeContent: View {
 
     var onDeleteTrainingDay: (TrainingDay) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
-
-    var sortedExercises: [TrainingExercise] {
-        return trainingDay?.exercises.sorted(by: { $0.order < $1.order }) ?? []
-    }
 
     var body: some View {
         VStack {
@@ -123,7 +125,7 @@ struct HomeContent: View {
                 if !trainingDay.exercises.isEmpty {
                     ExercisesList(
                         selectedDate: selectedDate,
-                        exercises: sortedExercises,
+                        exercises: exercises,
                         onAddExercisePress: {
                             isShowingSheet = true
                         },
@@ -203,7 +205,17 @@ struct Empty: View {
         exerciseToEdit: $exerciseToEdit,
         selectedDate: $selectedDate,
         isLoading: false,
-        trainingDay: nil,
-        trainingDays: []
+        trainingDay: trainingDay,
+        trainingDays: [],
+        exercises: [
+            TrainingExercise(
+                name: "Pull ups",
+                sets: 4,
+                reps: 10,
+                rest: 120,
+                trainingDay: trainingDay,
+                type: ExerciseType.dynamic
+            )
+        ]
     )
 }
