@@ -131,87 +131,95 @@ struct GoalsContent: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            VStack {
-                GoalsHeader(filter: $filter)
+        GeometryReader { geometry in
+            ZStack(alignment: .bottomTrailing) {
+                VStack {
+                    GoalsHeader(filter: $filter)
 
-                if !pendingGoals.isEmpty || !completedGoals.isEmpty {
-                    ScrollView {
-                        if !pendingGoals.isEmpty && filter != .completed {
-                            if filter == .all {
-                                Text("Pending")
-                                    .padding(12)
-                                    .frame(maxWidth: .infinity).cornerRadius(12)
-                                    .background(.gray.opacity(0.25))
+                    if !pendingGoals.isEmpty || !completedGoals.isEmpty {
+                        ScrollView {
+                            if !pendingGoals.isEmpty && filter != .completed {
+                                if filter == .all {
+                                    Text("Pending")
+                                        .padding(12)
+                                        .frame(maxWidth: .infinity)
+                                        .cornerRadius(12)
+                                        .background(.gray.opacity(0.25))
+                                }
+
+                                LazyVGrid(columns: columns) {
+                                    ForEach(pendingGoals) { goal in
+                                        GoalItem(goal: goal)
+                                            .contextMenu {
+                                                contextMenuItems(for: goal)
+                                            }
+                                    }
+                                }.padding(.horizontal)
                             }
 
-                            LazyVGrid(columns: columns) {
-                                ForEach(pendingGoals) { goal in
-                                    GoalItem(goal: goal)
-                                        .contextMenu {
-                                            contextMenuItems(for: goal)
-                                        }
+                            if !completedGoals.isEmpty && filter != .pending {
+                                if filter == .all {
+                                    Text("Competed")
+                                        .padding(12)
+                                        .frame(maxWidth: .infinity)
+                                        .cornerRadius(12)
+                                        .background(.gray.opacity(0.25))
                                 }
-                            }.padding(.horizontal)
-                        }
 
-                        if !completedGoals.isEmpty && filter != .pending {
-                            if filter == .all {
-                                Text("Competed")
-                                    .padding(12)
-                                    .frame(maxWidth: .infinity).cornerRadius(12)
-                                    .background(.gray.opacity(0.25))
+                                LazyVGrid(columns: columns) {
+                                    ForEach(completedGoals) { goal in
+                                        GoalItem(goal: goal)
+                                            .contextMenu {
+                                                contextMenuItems(for: goal)
+                                            }
+                                    }
+                                }.padding(.horizontal)
                             }
 
-                            LazyVGrid(columns: columns) {
-                                ForEach(completedGoals) { goal in
-                                    GoalItem(goal: goal)
-                                        .contextMenu {
-                                            contextMenuItems(for: goal)
-                                        }
-                                }
-                            }.padding(.horizontal)
+                            Spacer().frame(
+                                height: geometry.safeAreaInsets.bottom + 80
+                            )
                         }
+                    } else {
+                        Text(
+                            filter == .all
+                                ? "No goals yet"
+                                : filter == .completed
+                                    ? "No completed goals yet"
+                                    : "No pending goals yet"
+                        )
+                        .padding(.vertical, 30)
                     }
-                } else {
-                    Text(
-                        filter == .all
-                            ? "No goals yet"
-                            : filter == .completed
-                                ? "No completed goals yet"
-                                : "No pending goals yet"
-                    )
-                    .padding(.vertical, 30)
+
+                    Spacer()
                 }
 
-                Spacer()
-            }
-
-            Button {
-                isShowingSheet = true
-            } label: {
-                FloatingBtn()
-            }
-            .padding()
-        }.sheet(isPresented: $isShowingSheet) {
-            GoalSheet(
-                onSubmit: { result in
-                    if let goalToUpdate = goalToUpdate {
-                        updateGoal(goalToUpdate, result)
-                    } else {
-                        addGoal(result)
-                    }
-                    isShowingSheet = false
-                },
-                goalToUpdate: goalToUpdate
-            )
-            .presentationDragIndicator(.visible).presentationDetents([
-                .height(detentHeight)
-            ])
-            .readAndBindHeight(to: $detentHeight)
-            .onDisappear {
-                goalToUpdate = nil
-            }
+                Button {
+                    isShowingSheet = true
+                } label: {
+                    FloatingBtn()
+                }
+                .padding()
+            }.sheet(isPresented: $isShowingSheet) {
+                GoalSheet(
+                    onSubmit: { result in
+                        if let goalToUpdate = goalToUpdate {
+                            updateGoal(goalToUpdate, result)
+                        } else {
+                            addGoal(result)
+                        }
+                        isShowingSheet = false
+                    },
+                    goalToUpdate: goalToUpdate
+                )
+                .presentationDragIndicator(.visible).presentationDetents([
+                    .height(detentHeight)
+                ])
+                .readAndBindHeight(to: $detentHeight)
+                .onDisappear {
+                    goalToUpdate = nil
+                }
+            }.ignoresSafeArea(.container, edges: .bottom)
         }
     }
 }

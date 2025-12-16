@@ -90,72 +90,76 @@ struct RecordsContent: View {
     var deleteExercise: (RecordModel) -> Void = { _ in }
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            VStack {
-                RecordsHeader(sort: $sort)
-                if !records.isEmpty {
-                    List(records, id: \.id) { record in
-                        RecordItem(record: record).swipeActions(
-                            edge: .trailing,
-                            allowsFullSwipe: false
-                        ) {
-                            Button(role: .destructive) {
-                                deleteExercise(record)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
+        GeometryReader { geometry in
+            ZStack(alignment: .bottomTrailing) {
+                VStack {
+                    RecordsHeader(sort: $sort)
+                    if !records.isEmpty {
+                        List(records, id: \.id) { record in
+                            RecordItem(record: record).swipeActions(
+                                edge: .trailing,
+                                allowsFullSwipe: false
+                            ) {
+                                Button(role: .destructive) {
+                                    deleteExercise(record)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
+                            .swipeActions(
+                                edge: .leading,
+                                allowsFullSwipe: false
+                            ) {
+                                Button {
+                                    recordToUpdate = record
+                                    isShowingSheet = true
+                                } label: {
+                                    Label("Edit", systemImage: "square.and.pencil")
+                                }.tint(.blue)
+                            }
+                        }.safeAreaInset(edge: .bottom) {
+                            Spacer().frame(height: geometry.safeAreaInsets.bottom + 80)
                         }
-                        .swipeActions(
-                            edge: .leading,
-                            allowsFullSwipe: false
-                        ) {
-                            Button {
-                                recordToUpdate = record
-                                isShowingSheet = true
-                            } label: {
-                                Label("Edit", systemImage: "square.and.pencil")
-                            }.tint(.blue)
-                        }
-                    }
-                } else {
-                    Text("No records yet")
-                        .padding(30)
-                    Spacer()
-                }
-            }
-
-            Button {
-                isShowingSheet = true
-            } label: {
-                FloatingBtn()
-            }
-            .padding()
-        }.sheet(isPresented: $isShowingSheet) {
-            RecordSheet(
-                onSubmit: { result in
-                    if let recordToUpdate = self.recordToUpdate {
-                        self.updateRecord(recordToUpdate, result)
                     } else {
-                        self.addRecord(
-                            RecordModel(
-                                exercise: result.exercise,
-                                count: result.count,
-                                unit: result.units,
-                                date: Date()
-                            )
-                        )
+                        Text("No records yet")
+                            .padding(30)
+                        Spacer()
                     }
-                    isShowingSheet = false
-                },
-                recordToUpdate: recordToUpdate
-            )
-            .presentationDragIndicator(.visible).presentationDetents([
-                .height(detentHeight)
-            ])
-            .readAndBindHeight(to: $detentHeight)
-            .onDisappear {
-                recordToUpdate = nil
-            }
+                }
+
+                Button {
+                    isShowingSheet = true
+                } label: {
+                    FloatingBtn()
+                }
+                .padding()
+            }.sheet(isPresented: $isShowingSheet) {
+                RecordSheet(
+                    onSubmit: { result in
+                        if let recordToUpdate = self.recordToUpdate {
+                            self.updateRecord(recordToUpdate, result)
+                        } else {
+                            self.addRecord(
+                                RecordModel(
+                                    exercise: result.exercise,
+                                    count: result.count,
+                                    unit: result.units,
+                                    date: Date()
+                                )
+                            )
+                        }
+                        isShowingSheet = false
+                    },
+                    recordToUpdate: recordToUpdate
+                )
+                .presentationDragIndicator(.visible).presentationDetents([
+                    .height(detentHeight)
+                ])
+                .readAndBindHeight(to: $detentHeight)
+                .onDisappear {
+                    recordToUpdate = nil
+                }
+            }.ignoresSafeArea(.container, edges: .bottom)
         }
     }
 }
