@@ -23,8 +23,33 @@ struct Presets: View {
 struct PresetsContent: View {
     var presets: [Preset]
 
+    @State var searchText: String = ""
+
     var body: some View {
-        Text("Hello, Presets!")
+        GeometryReader { geometry in
+            ZStack(alignment: .bottomTrailing) {
+                VStack {
+                    PresetsHeader(
+                        searchText: $searchText
+                    )
+                    if !presets.isEmpty {
+                        List(presets) { preset in
+                            PresetItem(preset: preset)
+                        }
+                    } else {
+                        Text("No presets yet")
+                            .padding(12)
+                    }
+                }
+
+                Button {
+                    // TODO add preset
+                } label: {
+                    FloatingBtn()
+                }
+                .padding()
+            }
+        }
     }
 }
 
@@ -33,6 +58,7 @@ struct PresetsContent: View {
         presets: [
             Preset(name: "Bar training"),
             Preset(name: "Handbalance training"),
+            Preset(name: "Hardcore training"),
         ]
     )
 }
