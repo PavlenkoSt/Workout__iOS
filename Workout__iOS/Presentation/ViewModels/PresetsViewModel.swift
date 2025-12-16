@@ -21,4 +21,20 @@ class PresetsViewModel: ObservableObject {
     func setContext(_ context: ModelContext) {
         self.repository.updateContext(context)
     }
+
+    func createPreset(result: PresetSubmitResult) {
+        Task {
+            do {
+                try await self.repository.createPreset(
+                    Preset(name: result.name)
+                )
+            } catch {
+                print("Failed to create preset - \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func updatePreset(presetToUpdate: Preset, result: PresetSubmitResult) {
+        presetToUpdate.name = result.name
+    }
 }

@@ -15,7 +15,16 @@ struct Presets: View {
 
     var body: some View {
         PresetsContent(
-            presets: presets
+            presets: presets,
+            createPreset: { result in
+                viewModel.createPreset(result: result)
+            },
+            updatePreset: { presetToUpdate, result in
+                viewModel.updatePreset(
+                    presetToUpdate: presetToUpdate,
+                    result: result
+                )
+            }
         )
     }
 }
@@ -23,7 +32,27 @@ struct Presets: View {
 struct PresetsContent: View {
     var presets: [Preset]
 
+    @State private var isShowingSheet = false
+    @State private var detentHeight: CGFloat = 0
     @State var searchText: String = ""
+    @State var presetToUpdate: Preset? = nil
+
+    var createPreset: (PresetSubmitResult) -> Void = { _ in }
+    var updatePreset:
+        (_ presetToUpdate: Preset, _ result: PresetSubmitResult) -> Void = {
+            _,
+            _ in
+        }
+
+    var presetsWithSearch: [Preset] {
+        if searchText.isEmpty {
+            return presets
+        }
+
+        return presets.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -32,22 +61,45 @@ struct PresetsContent: View {
                     PresetsHeader(
                         searchText: $searchText
                     )
-                    if !presets.isEmpty {
-                        List(presets) { preset in
+                    if !presetsWithSearch.isEmpty {
+                        List(presetsWithSearch) { preset in
                             PresetItem(preset: preset)
                         }
                     } else {
-                        Text("No presets yet")
-                            .padding(12)
+                        Text(
+                            presets.isEmpty
+                                ? "No presets yet" : "Presets not found"
+                        )
+                        .padding(12)
+                        Spacer()
                     }
                 }
 
                 Button {
-                    // TODO add preset
+                    isShowingSheet = true
                 } label: {
                     FloatingBtn()
                 }
                 .padding()
+            }
+        }.sheet(isPresented: $isShowingSheet) {
+            PresetSheet(
+                presetToUpdate: presetToUpdate,
+                onSubmit: { result in
+                    if let presetToUpdate = presetToUpdate {
+                        updatePreset(presetToUpdate, result)
+                    } else {
+                        createPreset(result)
+                    }
+                    isShowingSheet = false
+                }
+            )
+            .presentationDragIndicator(.visible).presentationDetents([
+                .height(detentHeight)
+            ])
+            .readAndBindHeight(to: $detentHeight)
+            .onDisappear {
+                presetToUpdate = nil
             }
         }
     }
