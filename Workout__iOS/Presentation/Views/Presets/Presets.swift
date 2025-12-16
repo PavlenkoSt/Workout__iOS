@@ -24,6 +24,9 @@ struct Presets: View {
                     presetToUpdate: presetToUpdate,
                     result: result
                 )
+            },
+            deletePreset: { preset in
+                viewModel.deletePreset(preset: preset)
             }
         )
     }
@@ -43,6 +46,7 @@ struct PresetsContent: View {
             _,
             _ in
         }
+    var deletePreset: (Preset) -> Void = { _ in }
 
     var presetsWithSearch: [Preset] {
         if searchText.isEmpty {
@@ -63,7 +67,30 @@ struct PresetsContent: View {
                     )
                     if !presetsWithSearch.isEmpty {
                         List(presetsWithSearch) { preset in
-                            PresetItem(preset: preset)
+                            PresetItem(preset: preset).swipeActions(
+                                edge: .trailing,
+                                allowsFullSwipe: false
+                            ) {
+                                Button(role: .destructive) {
+                                    deletePreset(preset)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                            .swipeActions(
+                                edge: .leading,
+                                allowsFullSwipe: false
+                            ) {
+                                Button {
+                                    presetToUpdate = preset
+                                    isShowingSheet = true
+                                } label: {
+                                    Label(
+                                        "Edit",
+                                        systemImage: "square.and.pencil"
+                                    )
+                                }.tint(.blue)
+                            }
                         }
                     } else {
                         Text(

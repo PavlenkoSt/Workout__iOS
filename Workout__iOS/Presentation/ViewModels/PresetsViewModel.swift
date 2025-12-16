@@ -37,4 +37,14 @@ class PresetsViewModel: ObservableObject {
     func updatePreset(presetToUpdate: Preset, result: PresetSubmitResult) {
         presetToUpdate.name = result.name
     }
+
+    func deletePreset(preset: Preset) {
+        Task {
+            do {
+                try await self.repository.deletePreset(preset)
+            } catch {
+                print("Failed to delete preset - \(error.localizedDescription)")
+            }
+        }
+    }
 }
