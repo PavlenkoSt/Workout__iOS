@@ -90,8 +90,8 @@ struct RecordsContent: View {
     var deleteExercise: (RecordModel) -> Void = { _ in }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .bottomTrailing) {
+            GeometryReader { geometry in
                 VStack {
                     RecordsHeader(sort: $sort)
                     if !records.isEmpty {
@@ -114,11 +114,16 @@ struct RecordsContent: View {
                                     recordToUpdate = record
                                     isShowingSheet = true
                                 } label: {
-                                    Label("Edit", systemImage: "square.and.pencil")
+                                    Label(
+                                        "Edit",
+                                        systemImage: "square.and.pencil"
+                                    )
                                 }.tint(.blue)
                             }
                         }.safeAreaInset(edge: .bottom) {
-                            Spacer().frame(height: geometry.safeAreaInsets.bottom + 80)
+                            Spacer().frame(
+                                height: geometry.safeAreaInsets.bottom + 80
+                            )
                         }
                     } else {
                         Text("No records yet")
@@ -126,40 +131,41 @@ struct RecordsContent: View {
                         Spacer()
                     }
                 }
-
-                Button {
-                    isShowingSheet = true
-                } label: {
-                    FloatingBtn()
-                }
-                .padding()
-            }.sheet(isPresented: $isShowingSheet) {
-                RecordSheet(
-                    onSubmit: { result in
-                        if let recordToUpdate = self.recordToUpdate {
-                            self.updateRecord(recordToUpdate, result)
-                        } else {
-                            self.addRecord(
-                                RecordModel(
-                                    exercise: result.exercise,
-                                    count: result.count,
-                                    unit: result.units,
-                                    date: Date()
-                                )
-                            )
-                        }
-                        isShowingSheet = false
-                    },
-                    recordToUpdate: recordToUpdate
-                )
-                .presentationDragIndicator(.visible).presentationDetents([
-                    .height(detentHeight)
-                ])
-                .readAndBindHeight(to: $detentHeight)
-                .onDisappear {
-                    recordToUpdate = nil
-                }
             }.ignoresSafeArea(.container, edges: .bottom)
+
+            Button {
+                isShowingSheet = true
+            } label: {
+                FloatingBtn()
+            }
+            .padding()
+        }.sheet(isPresented: $isShowingSheet) {
+            RecordSheet(
+                onSubmit: { result in
+                    if let recordToUpdate = self.recordToUpdate {
+                        self.updateRecord(recordToUpdate, result)
+                    } else {
+                        self.addRecord(
+                            RecordModel(
+                                exercise: result.exercise,
+                                count: result.count,
+                                unit: result.units,
+                                date: Date()
+                            )
+                        )
+                    }
+                    isShowingSheet = false
+                },
+                recordToUpdate: recordToUpdate
+            )
+            .presentationDragIndicator(.visible).presentationDetents([
+                .height(detentHeight)
+            ])
+            .readAndBindHeight(to: $detentHeight)
+            .onDisappear {
+                recordToUpdate = nil
+            }
+
         }
     }
 }

@@ -131,10 +131,15 @@ struct GoalsContent: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .bottomTrailing) {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+
+            GeometryReader { geometry in
                 VStack {
-                    GoalsHeader(filter: $filter)
+                    GoalsHeader(filter: $filter, width: geometry.size.width)
+
+                    Spacer().frame(height: 0)
 
                     if !pendingGoals.isEmpty || !completedGoals.isEmpty {
                         ScrollView {
@@ -145,6 +150,8 @@ struct GoalsContent: View {
                                         .frame(maxWidth: .infinity)
                                         .cornerRadius(12)
                                         .background(.gray.opacity(0.25))
+                                } else {
+                                    Spacer().frame(height: 20)
                                 }
 
                                 LazyVGrid(columns: columns) {
@@ -164,6 +171,8 @@ struct GoalsContent: View {
                                         .frame(maxWidth: .infinity)
                                         .cornerRadius(12)
                                         .background(.gray.opacity(0.25))
+                                } else {
+                                    Spacer().frame(height: 20)
                                 }
 
                                 LazyVGrid(columns: columns) {
@@ -193,33 +202,34 @@ struct GoalsContent: View {
 
                     Spacer()
                 }
-
-                Button {
-                    isShowingSheet = true
-                } label: {
-                    FloatingBtn()
-                }
-                .padding()
-            }.sheet(isPresented: $isShowingSheet) {
-                GoalSheet(
-                    onSubmit: { result in
-                        if let goalToUpdate = goalToUpdate {
-                            updateGoal(goalToUpdate, result)
-                        } else {
-                            addGoal(result)
-                        }
-                        isShowingSheet = false
-                    },
-                    goalToUpdate: goalToUpdate
-                )
-                .presentationDragIndicator(.visible).presentationDetents([
-                    .height(detentHeight)
-                ])
-                .readAndBindHeight(to: $detentHeight)
-                .onDisappear {
-                    goalToUpdate = nil
-                }
             }.ignoresSafeArea(.container, edges: .bottom)
+
+            Button {
+                isShowingSheet = true
+            } label: {
+                FloatingBtn()
+            }
+            .padding()
+        }.sheet(isPresented: $isShowingSheet) {
+            GoalSheet(
+                onSubmit: { result in
+                    if let goalToUpdate = goalToUpdate {
+                        updateGoal(goalToUpdate, result)
+                    } else {
+                        addGoal(result)
+                    }
+                    isShowingSheet = false
+                },
+                goalToUpdate: goalToUpdate
+            )
+            .presentationDragIndicator(.visible).presentationDetents([
+                .height(detentHeight)
+            ])
+            .readAndBindHeight(to: $detentHeight)
+            .onDisappear {
+                goalToUpdate = nil
+            }
+
         }
     }
 }

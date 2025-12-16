@@ -10,6 +10,8 @@ import SwiftUI
 struct GoalsHeader: View {
     @Binding var filter: GoalsFilter
 
+    var width: Double
+
     var body: some View {
         VStack {
             Menu {
@@ -38,17 +40,17 @@ struct GoalsHeader: View {
                     getGoalsFilterName(filter: filter),
                     systemImage: "arrow.uturn.down"
                 ) {}
-                .buttonStyle(.glassProminent).frame(width: 300).padding(
+                .buttonStyle(.glassProminent).frame(width: width).padding(
                     .vertical,
                     5
                 )
-            }
-        }
+            }.padding(.bottom, 10)
+        }.background(Color(.white))
     }
 }
 
 #Preview {
     @Previewable @State var filter: GoalsFilter = .all
 
-    GoalsHeader(filter: $filter)
+    GoalsHeader(filter: $filter, width: 1000)
 }

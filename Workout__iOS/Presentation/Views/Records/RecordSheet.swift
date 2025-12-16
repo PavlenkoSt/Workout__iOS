@@ -101,10 +101,10 @@ struct RecordSheet: View {
                 Spacer()
 
                 Picker("Units", selection: $units) {
-                    Text("Reps").tag(GoalUnit.reps)
-                    Text("Seconds").tag(GoalUnit.sec)
-                    Text("Minutes").tag(GoalUnit.min)
-                    Text("Kilometers").tag(GoalUnit.km)
+                    Text("Reps").tag(RecordUnit.reps)
+                    Text("Seconds").tag(RecordUnit.sec)
+                    Text("Minutes").tag(RecordUnit.min)
+                    Text("Kilometers").tag(RecordUnit.km)
                 }
             }
             .frame(maxWidth: .infinity)

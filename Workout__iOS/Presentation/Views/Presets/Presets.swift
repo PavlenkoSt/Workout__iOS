@@ -59,8 +59,9 @@ struct PresetsContent: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottomTrailing) {
+
+        ZStack(alignment: .bottomTrailing) {
+            GeometryReader { geometry in
                 VStack {
                     PresetsHeader(
                         searchText: $searchText
@@ -101,14 +102,14 @@ struct PresetsContent: View {
                         Spacer()
                     }
                 }
-
-                Button {
-                    isShowingSheet = true
-                } label: {
-                    FloatingBtn()
-                }
-                .padding()
             }
+
+            Button {
+                isShowingSheet = true
+            } label: {
+                FloatingBtn()
+            }
+            .padding()
         }.sheet(isPresented: $isShowingSheet) {
             PresetSheet(
                 presetToUpdate: presetToUpdate,
