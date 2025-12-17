@@ -80,9 +80,11 @@ struct ContentView: View {
                 )
             }
             Tab("Presets", systemImage: "heart.fill", value: .presets) {
-                Presets(
-                    viewModel: presetsVideModel
-                )
+                NavigationStack {
+                    Presets(
+                        viewModel: presetsVideModel
+                    )
+                }
             }
         }.onAppear {
             trainingViewModel.setContext(modelContext)

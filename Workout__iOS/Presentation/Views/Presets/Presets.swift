@@ -87,32 +87,40 @@ struct PresetsContent: View {
                         List {
                             ForEach(presetsWithSearch) {
                                 preset in
-
-                                PresetItem(preset: preset).swipeActions(
-                                    edge: .trailing,
-                                    allowsFullSwipe: false
-                                ) {
-                                    Button(role: .destructive) {
-                                        deletePreset(preset)
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
+                                NavigationLink(value: preset) {
+                                    PresetItem(preset: preset).swipeActions(
+                                        edge: .trailing,
+                                        allowsFullSwipe: false
+                                    ) {
+                                        Button(role: .destructive) {
+                                            deletePreset(preset)
+                                        } label: {
+                                            Label(
+                                                "Delete",
+                                                systemImage: "trash"
+                                            )
+                                        }
+                                    }
+                                    .swipeActions(
+                                        edge: .leading,
+                                        allowsFullSwipe: false
+                                    ) {
+                                        Button {
+                                            presetToUpdate = preset
+                                            isShowingSheet = true
+                                        } label: {
+                                            Label(
+                                                "Edit",
+                                                systemImage: "square.and.pencil"
+                                            )
+                                        }.tint(.blue)
                                     }
                                 }
-                                .swipeActions(
-                                    edge: .leading,
-                                    allowsFullSwipe: false
-                                ) {
-                                    Button {
-                                        presetToUpdate = preset
-                                        isShowingSheet = true
-                                    } label: {
-                                        Label(
-                                            "Edit",
-                                            systemImage: "square.and.pencil"
-                                        )
-                                    }.tint(.blue)
-                                }
-                            }.onMove(perform: handleMove)
+                            }
+                            .onMove(perform: handleMove)
+
+                        }.navigationDestination(for: Preset.self) {
+                            preset in PresetScreen(preset: preset)
                         }
                     } else {
                         Text(
