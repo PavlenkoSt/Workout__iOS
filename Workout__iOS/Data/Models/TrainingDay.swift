@@ -36,9 +36,9 @@ class TrainingDay {
                 toGranularity: .day
             )
             if comparisonResult == .orderedDescending {
-                return .failed
-            } else {
                 return .pending
+            } else {
+                return .failed
             }
         } else {
             return .completed
