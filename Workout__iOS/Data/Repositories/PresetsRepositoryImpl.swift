@@ -37,6 +37,14 @@ final class PresetsRepositoryImpl: PresetsRepository {
         try self.internalContext.save()
     }
 
+    func addExercisesToPreset(_ presetExercises: [PresetExercise]) async throws
+    {
+        for exercise in presetExercises {
+            internalContext.insert(exercise)
+        }
+        try internalContext.save()
+    }
+
     func deletePreset(_ preset: Preset) async throws {
         self.internalContext.delete(preset)
         try self.internalContext.save()

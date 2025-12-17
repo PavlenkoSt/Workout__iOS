@@ -28,6 +28,26 @@ struct Presets: View {
             deletePreset: { preset in
                 viewModel.deletePreset(preset: preset)
             },
+            addDefaultExerciseToPreset: { exerciseFormResult, preset in
+                viewModel.addDefaultExerciseToPreset(
+                    exerciseFormResult: exerciseFormResult,
+                    preset: preset
+                )
+            },
+            addLadderExerciseToPreset: { exerciseFormResult, preset in
+                viewModel.addLadderExerciseToPreset(
+                    exerciseFormResult: exerciseFormResult,
+                    preset: preset
+                )
+            },
+            addSimpleExerciseToPreset: {
+                exerciseFormResult,
+                preset in
+                viewModel.addSimpleExerciseToPreset(
+                    exerciseFormResult: exerciseFormResult,
+                    preset: preset
+                )
+            },
             updatePresetOrder: { reorderedPresets in
                 viewModel.updatePresetOrder(presets: reorderedPresets)
             }
@@ -50,6 +70,12 @@ struct PresetsContent: View {
             _ in
         }
     var deletePreset: (Preset) -> Void = { _ in }
+    var addDefaultExerciseToPreset:
+        (DefaultExerciseSubmitResult, Preset) -> Void = { _, _ in }
+    var addLadderExerciseToPreset:
+        (LadderExerciseSubmitResult, Preset) -> Void = { _, _ in }
+    var addSimpleExerciseToPreset:
+        (SimpleExerciseSubmitResult, Preset) -> Void = { _, _ in }
 
     var presetsWithSearch: [Preset] {
         if searchText.isEmpty {
@@ -120,7 +146,16 @@ struct PresetsContent: View {
                             .onMove(perform: handleMove)
 
                         }.navigationDestination(for: Preset.self) {
-                            preset in PresetScreen(preset: preset)
+                            preset in
+                            PresetScreen(
+                                preset: preset,
+                                addDefaultExerciseToPreset:
+                                    addDefaultExerciseToPreset,
+                                addLadderExerciseToPreset:
+                                    addLadderExerciseToPreset,
+                                addSimpleExerciseToPreset:
+                                    addSimpleExerciseToPreset,
+                            )
                         }
                     } else {
                         Text(

@@ -38,10 +38,10 @@ struct ExerciseSheet: View {
     var onSubmitLadderExercise: (LadderExerciseSubmitResult) -> Void = { _ in }
     var onSubmitSimpleExercise: (SimpleExerciseSubmitResult) -> Void = { _ in }
 
-    var exerciseToEdit: TrainingExercise?
+    var exerciseToEditFields: DefaultExerciseFormResult?
 
     var isEditing: Bool {
-        return exerciseToEdit != nil
+        return exerciseToEditFields != nil
     }
 
     var saveBtnText: String {
@@ -72,7 +72,7 @@ struct ExerciseSheet: View {
                         Text("Dynamic").tag(ExerciseType.dynamic)
                         Text("Static").tag(ExerciseType.staticType)
 
-                        if exerciseToEdit == nil {
+                        if exerciseToEditFields == nil {
                             Text("Ladder").tag(ExerciseType.ladder)
                         }
 
@@ -111,7 +111,7 @@ struct ExerciseSheet: View {
                         )
                     },
                     saveBtnText: saveBtnText,
-                    exerciseToEdit: exerciseToEdit,
+                    exerciseToEditFields: exerciseToEditFields,
                     savedSeed: $savedSeed
                 )
             } else if exerciseType == ExerciseType.ladder {

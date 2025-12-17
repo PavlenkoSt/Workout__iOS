@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DefaultExerciseFormResult {
+struct DefaultExerciseFormResult: Equatable {
     let name: String
     let reps: Int
     let sets: Int
@@ -18,7 +18,7 @@ struct DefaultExerciseForm: View {
     var onSubmit: (DefaultExerciseFormResult) -> Void = { _ in }
 
     var saveBtnText: String
-    var exerciseToEdit: TrainingExercise?
+    var exerciseToEditFields: DefaultExerciseFormResult?
 
     @Binding var savedSeed: ExerciseFormSeed
 
@@ -152,30 +152,30 @@ struct DefaultExerciseForm: View {
             Button(saveBtnText) { validateAndSubmit() }
                 .buttonStyle(.glassProminent)
         }.onAppear {
-            if let exerciseToEdit = exerciseToEdit {
-                exerciseName = exerciseToEdit.name
-                reps = String(exerciseToEdit.reps)
-                sets = String(exerciseToEdit.sets)
-                rest = String(exerciseToEdit.rest)
+            if let exerciseToEditFields = exerciseToEditFields {
+                exerciseName = exerciseToEditFields.name
+                reps = String(exerciseToEditFields.reps)
+                sets = String(exerciseToEditFields.sets)
+                rest = String(exerciseToEditFields.rest)
             }
 
             if let savedName = savedSeed.name, savedSeed.name != "",
-               savedSeed.name != nil
+                savedSeed.name != nil
             {
                 exerciseName = savedName
             }
 
             if let savedReps = savedSeed.reps, savedSeed.reps != "",
-               savedSeed.reps != nil
+                savedSeed.reps != nil
             {
                 reps = savedReps
             }
-        }.onChange(of: exerciseToEdit) { oldValue, newValue in
-            if let exerciseToEdit = newValue {
-                exerciseName = exerciseToEdit.name
-                reps = String(exerciseToEdit.reps)
-                sets = String(exerciseToEdit.sets)
-                rest = String(exerciseToEdit.rest)
+        }.onChange(of: exerciseToEditFields) { oldValue, newValue in
+            if let exerciseToEditFields = newValue {
+                exerciseName = exerciseToEditFields.name
+                reps = String(exerciseToEditFields.reps)
+                sets = String(exerciseToEditFields.sets)
+                rest = String(exerciseToEditFields.rest)
             }
         }
     }

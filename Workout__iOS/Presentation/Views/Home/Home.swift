@@ -99,6 +99,19 @@ struct HomeContent: View {
     var onDeleteTrainingDay: (TrainingDay) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
 
+    var exerciseToEditFields: DefaultExerciseFormResult? {
+        if let exerciseToEdit = exerciseToEdit {
+            DefaultExerciseFormResult(
+                name: exerciseToEdit.name,
+                reps: exerciseToEdit.reps,
+                sets: exerciseToEdit.sets,
+                rest: exerciseToEdit.sets
+            )
+        } else {
+            nil
+        }
+    }
+
     var body: some View {
         VStack {
             WeekSwiper(selectedDate: $selectedDate, trainingDays: trainingDays)
@@ -166,7 +179,7 @@ struct HomeContent: View {
                     onSubmitSimpleExercise(result)
                     isShowingSheet = false
                 },
-                exerciseToEdit: exerciseToEdit
+                exerciseToEditFields: exerciseToEditFields
             )
             .presentationDragIndicator(.visible).presentationDetents([
                 .height(detentHeight)
