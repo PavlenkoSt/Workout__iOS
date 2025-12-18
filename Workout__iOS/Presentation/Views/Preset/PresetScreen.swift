@@ -20,6 +20,7 @@ struct PresetScreen: View {
         (LadderExerciseSubmitResult, Preset) -> Void = { _, _ in }
     var addSimpleExerciseToPreset:
         (SimpleExerciseSubmitResult, Preset) -> Void = { _, _ in }
+    var deleteExerciseFromPreset: (PresetExercise) -> Void = { _ in }
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -60,7 +61,27 @@ struct PresetScreen: View {
                         PresetExerciseItem(
                             presetExercise: exercise,
                             index: index
-                        )
+                        ).swipeActions(
+                            edge: .trailing,
+                            allowsFullSwipe: false
+                        ) {
+                            Button(role: .destructive) {
+                                deleteExerciseFromPreset(exercise)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .swipeActions(
+                            edge: .leading,
+                            allowsFullSwipe: false
+                        ) {
+                            Button {
+                                exerciseToEdit = exercise
+                                isShowingSheet = true
+                            } label: {
+                                Label("Edit", systemImage: "square.and.pencil")
+                            }.tint(.blue)
+                        }
                     }
 
                     Button(

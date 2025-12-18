@@ -28,6 +28,9 @@ struct Presets: View {
             deletePreset: { preset in
                 viewModel.deletePreset(preset: preset)
             },
+            deleteExercise: { exercise in
+                viewModel.deleteExercise(exercise: exercise)
+            },
             addDefaultExerciseToPreset: { exerciseFormResult, preset in
                 viewModel.addDefaultExerciseToPreset(
                     exerciseFormResult: exerciseFormResult,
@@ -70,6 +73,7 @@ struct PresetsContent: View {
             _ in
         }
     var deletePreset: (Preset) -> Void = { _ in }
+    var deleteExercise: (PresetExercise) -> Void = { _ in }
     var addDefaultExerciseToPreset:
         (DefaultExerciseSubmitResult, Preset) -> Void = { _, _ in }
     var addLadderExerciseToPreset:
@@ -155,6 +159,7 @@ struct PresetsContent: View {
                                     addLadderExerciseToPreset,
                                 addSimpleExerciseToPreset:
                                     addSimpleExerciseToPreset,
+                                deleteExerciseFromPreset: deleteExercise
                             )
                         }
                     } else {

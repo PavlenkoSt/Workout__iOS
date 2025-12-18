@@ -53,6 +53,18 @@ class PresetsViewModel: ObservableObject {
         }
     }
 
+    func deleteExercise(exercise: PresetExercise) {
+        Task {
+            do {
+                try await self.repository.deleteExerciseFromPreset(exercise)
+            } catch {
+                print(
+                    "Failed to delete preset exercise - \(error.localizedDescription)"
+                )
+            }
+        }
+    }
+
     func updatePresetOrder(presets: [Preset]) {
         Task {
             do {
