@@ -7,9 +7,19 @@
 
 import SwiftUI
 
+enum SheetType: Identifiable {
+    case use
+    case addExercise
+
+    var id: Int { hashValue }
+}
+
 struct PresetScreen: View {
-    @State private var isShowingSheet = false
-    @State private var detentHeight: CGFloat = 0
+    @State private var activeSheet: SheetType?
+
+    @State private var exerciseSheetHeight: CGFloat = 0
+    @State private var useSheetHeight: CGFloat = 0
+
     @State private var exerciseToEdit: PresetExercise? = nil
 
     var preset: Preset
@@ -21,6 +31,10 @@ struct PresetScreen: View {
     var addSimpleExerciseToPreset:
         (SimpleExerciseSubmitResult, Preset) -> Void = { _, _ in }
     var deleteExerciseFromPreset: (PresetExercise) -> Void = { _ in }
+    var createTrainingDayFromPreset: (Date, Preset) -> Void = {
+        _,
+        _ in
+    }
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -45,7 +59,7 @@ struct PresetScreen: View {
                         "Add exercise",
                         systemImage: "plus",
                         action: {
-                            isShowingSheet = true
+                            activeSheet = .addExercise
                         }
                     )
                     .buttonStyle(.glassProminent)
@@ -77,7 +91,7 @@ struct PresetScreen: View {
                         ) {
                             Button {
                                 exerciseToEdit = exercise
-                                isShowingSheet = true
+                                activeSheet = .addExercise
                             } label: {
                                 Label("Edit", systemImage: "square.and.pencil")
                             }.tint(.blue)
@@ -87,7 +101,7 @@ struct PresetScreen: View {
                     Button(
                         "Add exercise",
                         systemImage: "plus",
-                        action: { isShowingSheet = true }
+                        action: { activeSheet = .addExercise }
                     )
                     .foregroundStyle(.white)
                     .buttonStyle(.glassProminent)
@@ -98,52 +112,67 @@ struct PresetScreen: View {
         }.navigationTitle(preset.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(
-                        "Use",
-                        action: { onUse(preset) }
-                    )
-                }
-            }.sheet(isPresented: $isShowingSheet) {
-                ExerciseSheet(
-                    onSubmitDefaultExercise: { result in
-                        if let exerciseToEdit = exerciseToEdit {
-                            exerciseToEdit.name = result.name
-                            exerciseToEdit.sets = result.sets
-                            exerciseToEdit.reps = result.reps
-                            exerciseToEdit.rest = result.rest
-                            exerciseToEdit.type = result.exerciseType
-                        } else {
-                            addDefaultExerciseToPreset(result, preset)
-                        }
-                        isShowingSheet = false
-                    },
-                    onSubmitLadderExercise: { result in
-                        addLadderExerciseToPreset(result, preset)
-                        isShowingSheet = false
-                    },
-                    onSubmitSimpleExercise: { result in
-                        if let exerciseToEdit = exerciseToEdit {
-                            exerciseToEdit.name = "simple_exercise"
-                            exerciseToEdit.sets = 1
-                            exerciseToEdit.reps = 1
-                            exerciseToEdit.rest = 1
-                            exerciseToEdit.type = result.exerciseType
-                        } else {
-                            addSimpleExerciseToPreset(result, preset)
-                        }
-                        isShowingSheet = false
-                    },
-                    exerciseToEditFields: exerciseToEditFields
-                )
-                .presentationDragIndicator(.visible).presentationDetents([
-                    .height(detentHeight)
-                ])
-                .readAndBindHeight(to: $detentHeight)
-                .onDisappear {
-                    exerciseToEdit = nil
+                if !preset.exercises.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(
+                            "Use",
+                            action: { activeSheet = .use }
+                        )
+                    }
                 }
             }
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .use:
+                    UsePresetSheet(
+                        preset: preset,
+                        createTrainingDayFromPreset: { date, preset in
+                            createTrainingDayFromPreset(date, preset)
+                            activeSheet = nil
+                        }
+                    ).readAndBindHeight(
+                        to: $useSheetHeight
+                    )
+                    .presentationDetents([.height(useSheetHeight)])
+                case .addExercise:
+                    ExerciseSheet(
+                        onSubmitDefaultExercise: { result in
+                            if let exerciseToEdit = exerciseToEdit {
+                                exerciseToEdit.name = result.name
+                                exerciseToEdit.sets = result.sets
+                                exerciseToEdit.reps = result.reps
+                                exerciseToEdit.rest = result.rest
+                                exerciseToEdit.type = result.exerciseType
+                            } else {
+                                addDefaultExerciseToPreset(result, preset)
+                            }
+                            activeSheet = nil
+                        },
+                        onSubmitLadderExercise: { result in
+                            addLadderExerciseToPreset(result, preset)
+                            activeSheet = nil
+                        },
+                        onSubmitSimpleExercise: { result in
+                            if let exerciseToEdit = exerciseToEdit {
+                                exerciseToEdit.name = "simple_exercise"
+                                exerciseToEdit.sets = 1
+                                exerciseToEdit.reps = 1
+                                exerciseToEdit.rest = 1
+                                exerciseToEdit.type = result.exerciseType
+                            } else {
+                                addSimpleExerciseToPreset(result, preset)
+                            }
+                            activeSheet = nil
+                        },
+                        exerciseToEditFields: exerciseToEditFields
+                    )
+                    .readAndBindHeight(to: $exerciseSheetHeight)
+                    .presentationDetents([.height(exerciseSheetHeight)])
+                }
+            }.onDisappear {
+                exerciseToEdit = nil
+            }
+
     }
 }
 

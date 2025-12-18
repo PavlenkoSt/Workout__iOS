@@ -15,4 +15,5 @@ protocol PresetsRepository {
     func deleteExerciseFromPreset(_ presetExercise: PresetExercise) async throws
     func getPresets() async throws -> [Preset]
     func save() async throws
+    func createTrainingDayFromPreset(date: Date, preset: Preset) async throws
 }

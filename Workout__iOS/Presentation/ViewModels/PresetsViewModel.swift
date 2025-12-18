@@ -189,6 +189,13 @@ class PresetsViewModel: ObservableObject {
         }
     }
 
+    func createTrainingDayFromPreset(date: Date, preset: Preset) async throws {
+        try await repository.createTrainingDayFromPreset(
+            date: date,
+            preset: preset
+        )
+    }
+
     private func mapLadderPresetExercises(
         exerciseFormResult: LadderExerciseSubmitResult,
         preset: Preset

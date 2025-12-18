@@ -7,8 +7,11 @@
 
 import SwiftData
 import SwiftUI
+import Toasts
 
 struct Presets: View {
+    @Environment(\.presentToast) var presentToast
+    
     @ObservedObject var viewModel: PresetsViewModel
 
     @Query(sort: [SortDescriptor(\Preset.order)]) var presets: [Preset]
@@ -53,6 +56,32 @@ struct Presets: View {
             },
             updatePresetOrder: { reorderedPresets in
                 viewModel.updatePresetOrder(presets: reorderedPresets)
+            },
+            createTrainingDayFromPreset: { date, preset in
+                Task {
+                    try await presentToast(
+                        message: "Loading...",
+                        task: {
+                            try await viewModel.createTrainingDayFromPreset(
+                                date: date,
+                                preset: preset
+                            )
+                        },
+                        onSuccess: { result in
+                            ToastValue(
+                                icon: Image(systemName: "checkmark.circle"),
+                                message: "Training day has been created"
+                            )
+                        },
+                        onFailure: { error in
+                            ToastValue(
+                                icon: Image(systemName: "xmark.circle"),
+                                message: "Training day already exists"
+                            )
+                        }
+                    )
+                }
+                
             }
         )
     }
@@ -91,6 +120,10 @@ struct PresetsContent: View {
         }
     }
     var updatePresetOrder: ([Preset]) -> Void = { _ in }
+    var createTrainingDayFromPreset: (Date, Preset) -> Void = {
+        _,
+        _ in
+    }
 
     private func handleMove(from source: IndexSet, to destination: Int) {
         var mutablePresets = presetsWithSearch
@@ -159,7 +192,9 @@ struct PresetsContent: View {
                                     addLadderExerciseToPreset,
                                 addSimpleExerciseToPreset:
                                     addSimpleExerciseToPreset,
-                                deleteExerciseFromPreset: deleteExercise
+                                deleteExerciseFromPreset: deleteExercise,
+                                createTrainingDayFromPreset:
+                                    createTrainingDayFromPreset
                             )
                         }
                     } else {

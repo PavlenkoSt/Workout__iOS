@@ -59,4 +59,56 @@ final class PresetsRepositoryImpl: PresetsRepository {
     func save() async throws {
         try self.internalContext.save()
     }
+
+    func createTrainingDayFromPreset(date: Date, preset: Preset) async throws {
+        let calendar = Calendar.current
+            
+        let startDate = calendar.startOfDay(for: date)
+        
+        let descriptor = FetchDescriptor<TrainingDay>(
+            predicate: #Predicate { $0.date == startDate }
+        )
+
+        let trainingDay = try self.internalContext.fetch(descriptor).first
+
+        if trainingDay != nil {
+            throw TrainingError.dayAlreadyExists
+        }
+
+        let createdTrainingDay = TrainingDay(date: startDate)
+        var exercises: [TrainingExercise] = []
+
+        preset.exercises.forEach { presetExercise in
+            exercises.append(
+                TrainingExercise(
+                    name: presetExercise.name,
+                    order: exercises.count,
+                    sets: presetExercise.sets,
+                    reps: presetExercise.reps,
+                    rest: presetExercise.rest,
+                    trainingDay: createdTrainingDay,
+                    type: presetExercise.type,
+                )
+            )
+        }
+
+        exercises.forEach { exercise in
+            self.internalContext.insert(exercise)
+        }
+        
+        self.internalContext.insert(createdTrainingDay)
+
+        try self.internalContext.save()
+    }
+}
+
+enum TrainingError: LocalizedError {
+    case dayAlreadyExists
+
+    var errorDescription: String? {
+        switch self {
+        case .dayAlreadyExists:
+            return "A training session is already scheduled for this date."
+        }
+    }
 }
