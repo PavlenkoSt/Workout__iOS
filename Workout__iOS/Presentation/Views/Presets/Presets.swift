@@ -11,7 +11,7 @@ import Toasts
 
 struct Presets: View {
     @Environment(\.presentToast) var presentToast
-    
+
     @ObservedObject var viewModel: PresetsViewModel
 
     @Query(sort: [SortDescriptor(\Preset.order)]) var presets: [Preset]
@@ -57,6 +57,11 @@ struct Presets: View {
             updatePresetOrder: { reorderedPresets in
                 viewModel.updatePresetOrder(presets: reorderedPresets)
             },
+            updatePresetExercisesOrder: { reorderedPresetExercises in
+                viewModel.updatePresetExercisesOrder(
+                    presetExercises: reorderedPresetExercises
+                )
+            },
             createTrainingDayFromPreset: { date, preset in
                 Task {
                     try await presentToast(
@@ -81,7 +86,7 @@ struct Presets: View {
                         }
                     )
                 }
-                
+
             }
         )
     }
@@ -120,6 +125,7 @@ struct PresetsContent: View {
         }
     }
     var updatePresetOrder: ([Preset]) -> Void = { _ in }
+    var updatePresetExercisesOrder: ([PresetExercise]) -> Void = { _ in }
     var createTrainingDayFromPreset: (Date, Preset) -> Void = {
         _,
         _ in
@@ -194,7 +200,8 @@ struct PresetsContent: View {
                                     addSimpleExerciseToPreset,
                                 deleteExerciseFromPreset: deleteExercise,
                                 createTrainingDayFromPreset:
-                                    createTrainingDayFromPreset
+                                    createTrainingDayFromPreset,
+                                updatePresetExercisesOrder: updatePresetExercisesOrder
                             )
                         }
                     } else {

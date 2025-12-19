@@ -84,6 +84,25 @@ class PresetsViewModel: ObservableObject {
         }
     }
 
+    func updatePresetExercisesOrder(presetExercises: [PresetExercise]) {
+        Task {
+            do {
+                for (index, presetExercise) in presetExercises.enumerated() {
+                    if presetExercise.order != index {
+                        presetExercise.order = index
+                    }
+                }
+
+                try await self.repository.save()
+
+            } catch {
+                print(
+                    "Failed to update preset exercise order - \(error.localizedDescription)"
+                )
+            }
+        }
+    }
+
     func addDefaultExerciseToPreset(
         exerciseFormResult: DefaultExerciseSubmitResult,
         preset: Preset,
@@ -106,6 +125,7 @@ class PresetsViewModel: ObservableObject {
 
                 let exercise = PresetExercise(
                     name: exerciseFormResult.name,
+                    order: preset.exercises.count,
                     sets: exerciseFormResult.sets,
                     reps: exerciseFormResult.reps,
                     rest: exerciseFormResult.rest,
@@ -127,7 +147,6 @@ class PresetsViewModel: ObservableObject {
     ) {
         Task {
             do {
-
                 if preset.exercises.isEmpty {
                     let warmup = PresetExercise(
                         name: "Warmup",
@@ -175,6 +194,7 @@ class PresetsViewModel: ObservableObject {
 
                 let exercise = PresetExercise(
                     name: "simple_exercise",
+                    order: preset.exercises.count,
                     sets: 1,
                     reps: 1,
                     rest: 1,

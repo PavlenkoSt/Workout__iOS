@@ -35,6 +35,7 @@ struct PresetScreen: View {
         _,
         _ in
     }
+    var updatePresetExercisesOrder: ([PresetExercise]) -> Void = { _ in }
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -47,6 +48,24 @@ struct PresetScreen: View {
         } else {
             nil
         }
+    }
+
+    var sortedExercises: [PresetExercise] {
+        return preset.exercises.sorted(by: { $0.order < $1.order })
+    }
+
+    private func handleMove(from source: IndexSet, to destination: Int) {
+        var mutablePresetExercise = sortedExercises
+
+        mutablePresetExercise.move(fromOffsets: source, toOffset: destination)
+
+        for (newIndex, exercise) in mutablePresetExercise.enumerated() {
+            if exercise.order != newIndex {
+                exercise.order = newIndex
+            }
+        }
+
+        updatePresetExercisesOrder(mutablePresetExercise)
     }
 
     var body: some View {
@@ -69,7 +88,7 @@ struct PresetScreen: View {
             } else {
                 List {
                     ForEach(
-                        Array(preset.exercises.enumerated()),
+                        Array(sortedExercises.enumerated()),
                         id: \.element.id
                     ) { index, exercise in
                         PresetExerciseItem(
@@ -96,7 +115,7 @@ struct PresetScreen: View {
                                 Label("Edit", systemImage: "square.and.pencil")
                             }.tint(.blue)
                         }
-                    }
+                    }.onMove(perform: handleMove)
 
                     Button(
                         "Add exercise",
