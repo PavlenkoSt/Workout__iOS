@@ -12,12 +12,12 @@ import SwiftUI
 
 @MainActor
 class GoalsViewModel: ObservableObject {
-    private let repository: GoalsRepositoryImpl
-    private let recordsRepository: RecordsRepositoryImpl
+    private let repository: GoalsRepository
+    private let recordsRepository: RecordsRepository
 
     init(
-        repository: GoalsRepositoryImpl,
-        recordsRepository: RecordsRepositoryImpl
+        repository: GoalsRepository,
+        recordsRepository: RecordsRepository
     ) {
         self.repository = repository
         self.recordsRepository = recordsRepository

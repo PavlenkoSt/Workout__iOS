@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum SheetType: Identifiable {
+enum PresetSheetType: Identifiable {
     case use
     case addExercise
 
@@ -15,7 +15,7 @@ enum SheetType: Identifiable {
 }
 
 struct PresetScreen: View {
-    @State private var activeSheet: SheetType?
+    @State private var activeSheet: PresetSheetType?
 
     @State private var exerciseSheetHeight: CGFloat = 0
     @State private var useSheetHeight: CGFloat = 0
@@ -149,9 +149,8 @@ struct PresetScreen: View {
                             createTrainingDayFromPreset(date, preset)
                             activeSheet = nil
                         }
-                    ).readAndBindHeight(
-                        to: $useSheetHeight
                     )
+                    .readAndBindHeight(to: $useSheetHeight)
                     .presentationDetents([.height(useSheetHeight)])
                 case .addExercise:
                     ExerciseSheet(

@@ -12,9 +12,9 @@ import SwiftUI
 
 @MainActor
 class PresetsViewModel: ObservableObject {
-    private let repository: PresetsRepositoryImpl
+    private let repository: PresetsRepository
 
-    init(repository: PresetsRepositoryImpl) {
+    init(repository: PresetsRepository) {
         self.repository = repository
     }
 

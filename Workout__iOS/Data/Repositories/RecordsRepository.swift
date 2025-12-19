@@ -1,5 +1,5 @@
 //
-//  RecordsRepositoryImpl.swift
+//  RecordsRepository.swift
 //  Workout__iOS
 //
 //  Created by Stanislav Pavlenko on 14.12.2025.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @MainActor
-final class RecordsRepositoryImpl: RecordsRepository {
+final class RecordsRepository {
     private var internalContext: ModelContext
 
     var context: ModelContext { internalContext }

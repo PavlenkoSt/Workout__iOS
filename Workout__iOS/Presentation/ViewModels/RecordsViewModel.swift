@@ -11,9 +11,9 @@ import SwiftData
 import SwiftUI
 
 class RecordsViewModel: ObservableObject {
-    private let repository: RecordsRepositoryImpl
+    private let repository: RecordsRepository
 
-    init(repository: RecordsRepositoryImpl) {
+    init(repository: RecordsRepository) {
         self.repository = repository
     }
 

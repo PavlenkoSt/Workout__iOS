@@ -12,10 +12,15 @@ import SwiftUI
 
 @MainActor
 class TrainingViewModel: ObservableObject {
-    private let repository: TrainingRepositoryImpl
+    private let repository: TrainingRepository
+    private let presetsRepository: PresetsRepository
 
-    init(repository: TrainingRepositoryImpl) {
+    init(
+        repository: TrainingRepository,
+        presetsRepository: PresetsRepository
+    ) {
         self.repository = repository
+        self.presetsRepository = presetsRepository
     }
 
     func setContext(_ context: ModelContext) {
@@ -209,6 +214,43 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = 1
         exerciseToEdit.rest = 1
         exerciseToEdit.type = exerciseFormResult.exerciseType
+    }
+
+    func saveTrainingDayAsPreset(
+        trainingDay: TrainingDay,
+        saveAsPresetSubmitResult: SaveAsPresetSubmitResult
+    ) {
+        Task {
+            do {
+                let preset = Preset(name: saveAsPresetSubmitResult.name)
+
+                try await presetsRepository.createPreset(preset)
+
+                var presetExercises: [PresetExercise] = []
+
+                trainingDay.exercises
+                    .sorted(by: { $0.order < $1.order })
+                    .forEach { exercise in
+                        presetExercises.append(
+                            PresetExercise(
+                                name: exercise.name,
+                                order: exercise.order,
+                                sets: exercise.sets,
+                                reps: exercise.reps,
+                                rest: exercise.rest,
+                                preset: preset,
+                                type: exercise.type
+                            )
+                        )
+                    }
+
+                try await presetsRepository.addExercisesToPreset(
+                    presetExercises
+                )
+            } catch {
+                print("Failed to save training day as preset. Error: \(error)")
+            }
+        }
     }
 
     private func mapLadderExercises(

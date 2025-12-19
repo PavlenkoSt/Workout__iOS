@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @MainActor
-final class GoalsRepositoryImpl: GoalsRepository {
+final class GoalsRepository {
     private var internalContext: ModelContext
 
     var context: ModelContext { internalContext }

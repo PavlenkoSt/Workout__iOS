@@ -1,5 +1,5 @@
 //
-//  TrainingRepositoryImpl.swift
+//  TrainingRepository.swift
 //  Workout__iOS
 //
 //  Created by Stanislav Pavlenko on 29.11.2025.
@@ -15,7 +15,7 @@ enum TrainingRepositoryError: Error {
 }
 
 @MainActor
-final class TrainingRepositoryImpl: TrainingDayRepository {
+final class TrainingRepository {
     private var internalContext: ModelContext
 
     var context: ModelContext { internalContext }

@@ -1,22 +1,21 @@
 //
-//  PresetSheet.swift
+//  SaveAsPresetSheet.swift
 //  Workout__iOS
 //
-//  Created by Stanislav Pavlenko on 16.12.2025.
+//  Created by Stanislav Pavlenko on 19.12.2025.
 //
 
 import SwiftUI
 
-struct PresetSubmitResult {
-    let name: String
+struct SaveAsPresetSubmitResult {
+    var name: String
 }
 
-struct PresetSheet: View {
+struct SaveAsPresetSheet: View {
     @State private var name: String = ""
     @State private var nameError: String? = nil
 
-    var presetToUpdate: Preset? = nil
-    var onSubmit: (PresetSubmitResult) -> Void = { _ in }
+    var onSubmit: (SaveAsPresetSubmitResult) -> Void = { _ in }
 
     private func validateAndSubmit() -> Bool {
 
@@ -30,7 +29,7 @@ struct PresetSheet: View {
         // All validations passed
         if isValid {
             onSubmit(
-                PresetSubmitResult(
+                SaveAsPresetSubmitResult(
                     name: name
                 )
             )
@@ -41,7 +40,7 @@ struct PresetSheet: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Text(presetToUpdate != nil ? "Update preset" : "Add new preset")
+            Text("Save as preset")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
@@ -60,25 +59,16 @@ struct PresetSheet: View {
                 }
             )
 
-            Button(presetToUpdate != nil ? "Update" : "Create") {
+            Button("Save") {
                 validateAndSubmit()
             }
             .buttonStyle(.glassProminent)
 
         }
         .padding(10)
-        .onAppear {
-            if let presetToUpdate = presetToUpdate {
-                name = presetToUpdate.name
-            }
-        }.onChange(of: presetToUpdate) { oldValue, newValue in
-            if let presetToUpdate = newValue {
-                name = presetToUpdate.name
-            }
-        }
     }
 }
 
 #Preview {
-    PresetSheet()
+    SaveAsPresetSheet()
 }

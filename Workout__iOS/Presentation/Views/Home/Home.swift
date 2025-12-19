@@ -7,7 +7,15 @@
 
 import SwiftData
 import SwiftUI
+import Toasts
 import _SwiftData_SwiftUI
+
+enum HomeSheetType: Identifiable {
+    case exercise
+    case saveAsPreset
+
+    var id: Int { hashValue }
+}
 
 struct Home: View {
     @ObservedObject var viewModel: TrainingViewModel
@@ -73,14 +81,23 @@ struct Home: View {
             },
             onDeleteExercise: { exercise in
                 viewModel.deleteExercise(exercise)
+            },
+            saveAsPreset: { trainingDay, saveAsPresetSubmitResult in
+                viewModel.saveTrainingDayAsPreset(
+                    trainingDay: trainingDay,
+                    saveAsPresetSubmitResult: saveAsPresetSubmitResult
+                )
             }
         )
     }
 }
 
 struct HomeContent: View {
-    @State private var isShowingSheet = false
-    @State private var detentHeight: CGFloat = 0
+    @Environment(\.presentToast) var presentToast
+
+    @State var activeSheet: HomeSheetType? = nil
+    @State private var exerciseDetentHeight: CGFloat = 0
+    @State private var saveAsPresetDetentHeight: CGFloat = 0
 
     @Binding var exerciseToEdit: TrainingExercise?
     @Binding var selectedDate: Date
@@ -98,6 +115,10 @@ struct HomeContent: View {
 
     var onDeleteTrainingDay: (TrainingDay) -> Void = { _ in }
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
+    var saveAsPreset: (TrainingDay, SaveAsPresetSubmitResult) -> Void = {
+        _,
+        _ in
+    }
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -118,6 +139,11 @@ struct HomeContent: View {
 
             if let trainingDay = trainingDay {
                 Menu {
+                    Button(
+                        action: { activeSheet = .saveAsPreset }
+                    ) {
+                        Label("Save as preset", systemImage: "plus")
+                    }
                     Button(
                         role: .destructive,
                         action: { onDeleteTrainingDay(trainingDay) }
@@ -140,12 +166,12 @@ struct HomeContent: View {
                         selectedDate: selectedDate,
                         exercises: exercises,
                         onAddExercisePress: {
-                            isShowingSheet = true
+                            activeSheet = .exercise
                         },
                         onDeleteExercise: onDeleteExercise,
                         onUpdateExercise: { exercise in
                             exerciseToEdit = exercise
-                            isShowingSheet = true
+                            activeSheet = .exercise
                         }
                     )
                 } else {
@@ -153,7 +179,7 @@ struct HomeContent: View {
                         text: "No exercises yet",
                         btnText: "Add exercise"
                     ) {
-                        isShowingSheet = true
+                        activeSheet = .exercise
                     }
                 }
             } else {
@@ -161,32 +187,46 @@ struct HomeContent: View {
                     text: "No training yet",
                     btnText: "Create training"
                 ) {
-                    isShowingSheet = true
+                    activeSheet = .exercise
                 }
             }
-
-        }.sheet(isPresented: $isShowingSheet) {
-            ExerciseSheet(
-                onSubmitDefaultExercise: { result in
-                    onSubmitDefaultExercise(result)
-                    isShowingSheet = false
-                },
-                onSubmitLadderExercise: { result in
-                    onSubmitLadderExercise(result)
-                    isShowingSheet = false
-                },
-                onSubmitSimpleExercise: { result in
-                    onSubmitSimpleExercise(result)
-                    isShowingSheet = false
-                },
-                exerciseToEditFields: exerciseToEditFields
-            )
-            .presentationDragIndicator(.visible).presentationDetents([
-                .height(detentHeight)
-            ])
-            .readAndBindHeight(to: $detentHeight)
-            .onDisappear {
-                exerciseToEdit = nil
+        }.sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .exercise:
+                ExerciseSheet(
+                    onSubmitDefaultExercise: { result in
+                        onSubmitDefaultExercise(result)
+                        activeSheet = nil
+                    },
+                    onSubmitLadderExercise: { result in
+                        onSubmitLadderExercise(result)
+                        activeSheet = nil
+                    },
+                    onSubmitSimpleExercise: { result in
+                        onSubmitSimpleExercise(result)
+                        activeSheet = nil
+                    },
+                    exerciseToEditFields: exerciseToEditFields
+                )
+                .presentationDetents([.height(exerciseDetentHeight)])
+                .readAndBindHeight(to: $exerciseDetentHeight)
+                .onDisappear {
+                    exerciseToEdit = nil
+                }
+            case .saveAsPreset:
+                SaveAsPresetSheet(
+                    onSubmit: { submitResult in
+                        if let trainingDay = trainingDay {
+                            saveAsPreset(trainingDay, submitResult)
+                            presentToast(
+                                ToastValue(message: "Saved as preset"),
+                            )
+                            activeSheet = nil
+                        }
+                    }
+                )
+                .presentationDetents([.height(saveAsPresetDetentHeight)])
+                .readAndBindHeight(to: $saveAsPresetDetentHeight)
             }
         }
     }

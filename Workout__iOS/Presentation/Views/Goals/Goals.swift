@@ -210,7 +210,8 @@ struct GoalsContent: View {
                 FloatingBtn()
             }
             .padding()
-        }.sheet(isPresented: $isShowingSheet) {
+        }
+        .sheet(isPresented: $isShowingSheet) {
             GoalSheet(
                 onSubmit: { result in
                     if let goalToUpdate = goalToUpdate {
