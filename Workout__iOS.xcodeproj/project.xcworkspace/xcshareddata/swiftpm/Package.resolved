@@ -1,6 +1,15 @@
 {
-  "originHash" : "935ec17ad4a01b0963765297e20ae485bc26104e77e5b496cefca85f959ec77f",
+  "originHash" : "10193111bc3ab5ad7253f88c837227c4844424ac8981aa1d03cfbd5eda1108ae",
   "pins" : [
+    {
+      "identity" : "purchases-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios.git",
+      "state" : {
+        "revision" : "6b95744e70f1edc43f89f2b522b0832ddfdd41a1",
+        "version" : "5.73.0"
+      }
+    },
     {
       "identity" : "swiftui-toasts",
       "kind" : "remoteSourceControl",

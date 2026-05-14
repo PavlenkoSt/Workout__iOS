@@ -24,6 +24,9 @@ struct ContentView: View {
     @StateObject private var goalsViewModel: GoalsViewModel
     @StateObject private var recordsViewModel: RecordsViewModel
     @StateObject private var presetsViewModel: PresetsViewModel
+    @StateObject private var monetizationViewModel = MonetizationViewModel()
+
+    @State private var isShowingPaywall = false
 
     init() {
         let tempContainer = try! ModelContainer(
@@ -69,32 +72,50 @@ struct ContentView: View {
         TabView(selection: $selectedTab) {
             Tab("Home", systemImage: "house.fill", value: .home) {
                 Home(
-                    viewModel: trainingViewModel
+                    viewModel: trainingViewModel,
+                    monetizationState: monetizationViewModel.state,
+                    presentPaywall: presentPaywall
                 )
             }
             Tab("Goals", systemImage: "checkmark", value: .goals) {
                 Goals(
-                    viewModel: goalsViewModel
+                    viewModel: goalsViewModel,
+                    monetizationState: monetizationViewModel.state,
+                    presentPaywall: presentPaywall
                 )
             }
             Tab("Records", systemImage: "star.fill", value: .records) {
                 Records(
-                    viewModel: recordsViewModel
+                    viewModel: recordsViewModel,
+                    monetizationState: monetizationViewModel.state,
+                    presentPaywall: presentPaywall
                 )
             }
             Tab("Presets", systemImage: "heart.fill", value: .presets) {
                 NavigationStack {
                     Presets(
-                        viewModel: presetsViewModel
+                        viewModel: presetsViewModel,
+                        monetizationState: monetizationViewModel.state,
+                        presentPaywall: presentPaywall
                     )
                 }
             }
-        }.onAppear {
+        }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallSheet(viewModel: monetizationViewModel)
+        }
+        .onAppear {
             trainingViewModel.setContext(modelContext)
             goalsViewModel.setContext(modelContext)
             recordsViewModel.setContext(modelContext)
             presetsViewModel.setContext(modelContext)
+            monetizationViewModel.refresh()
         }
+    }
+
+    private func presentPaywall() {
+        guard RevenueCatInitializer.configure() else { return }
+        isShowingPaywall = true
     }
 }
 

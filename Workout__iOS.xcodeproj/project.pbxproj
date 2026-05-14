@@ -8,15 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		4B23098A2EEF2E6A00665AB1 /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2309892EEF2E6A00665AB1 /* Toasts */; };
+		4B23098B2EEF2E6A00665AB1 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 4B23098C2EEF2E6A00665AB1 /* RevenueCat */; };
+		4B23098D2EEF2E6A00665AB1 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4B23098E2EEF2E6A00665AB1 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		4B611BDB2EDB26710000DCF0 /* Workout__iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Workout__iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4B2309902EEF2E6A00665AB1 /* Exceptions for "Workout__iOS" folder in "Workout__iOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4B611BDA2EDB26710000DCF0 /* Workout__iOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4B611BDD2EDB26710000DCF0 /* Workout__iOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4B2309902EEF2E6A00665AB1 /* Exceptions for "Workout__iOS" folder in "Workout__iOS" target */,
+			);
 			path = Workout__iOS;
 			sourceTree = "<group>";
 		};
@@ -27,6 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B23098B2EEF2E6A00665AB1 /* RevenueCat in Frameworks */,
+				4B23098D2EEF2E6A00665AB1 /* RevenueCatUI in Frameworks */,
 				4B23098A2EEF2E6A00665AB1 /* Toasts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,6 +87,8 @@
 			);
 			name = Workout__iOS;
 			packageProductDependencies = (
+				4B23098C2EEF2E6A00665AB1 /* RevenueCat */,
+				4B23098E2EEF2E6A00665AB1 /* RevenueCatUI */,
 				4B2309892EEF2E6A00665AB1 /* Toasts */,
 			);
 			productName = Workout__iOS;
@@ -102,6 +121,7 @@
 			mainGroup = 4B611BD22EDB26710000DCF0;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				4B23098F2EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				4B2309882EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -267,7 +287,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RRDH7LPQ4K;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Workout__iOS/Info.plist;
+				INFOPLIST_KEY_PRO_UNLOCK_CODE = "$(PRO_UNLOCK_CODE)";
+				INFOPLIST_KEY_REVENUECAT_API_KEY = "$(REVENUECAT_API_KEY)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -279,8 +302,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pavlenko.learning.Workout--iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.stanislav-pav.repstation";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRO_UNLOCK_CODE = BestWorkoutApp;
+				REVENUECAT_API_KEY = appl_YXkWHgGJyLixtyLeRaNSSxiKOmR;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -304,7 +329,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = RRDH7LPQ4K;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Workout__iOS/Info.plist;
+				INFOPLIST_KEY_PRO_UNLOCK_CODE = "$(PRO_UNLOCK_CODE)";
+				INFOPLIST_KEY_REVENUECAT_API_KEY = "$(REVENUECAT_API_KEY)";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -317,8 +345,10 @@
 				);
 				MARKETING_VERSION = 1.0;
 				"MODULEMAP_FILE[sdk=*]" = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pavlenko.learning.Workout--iOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.stanislav-pav.repstation";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRO_UNLOCK_CODE = BestWorkoutApp;
+				REVENUECAT_API_KEY = appl_YXkWHgGJyLixtyLeRaNSSxiKOmR;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -362,6 +392,14 @@
 				minimumVersion = 1.1.1;
 			};
 		};
+		4B23098F2EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.16.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -369,6 +407,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B2309882EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "swiftui-toasts" */;
 			productName = Toasts;
+		};
+		4B23098C2EEF2E6A00665AB1 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B23098F2EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		4B23098E2EEF2E6A00665AB1 /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B23098F2EEF2E6A00665AB1 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

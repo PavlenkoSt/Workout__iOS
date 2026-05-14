@@ -14,6 +14,8 @@ struct WorkoutApp: App {
     let container: ModelContainer
 
     init() {
+        RevenueCatInitializer.configure()
+
         do {
             container = try ModelContainer(
                 for: TrainingDay.self,

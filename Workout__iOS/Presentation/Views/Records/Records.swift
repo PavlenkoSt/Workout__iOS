@@ -26,6 +26,8 @@ struct RecordsSorting {
 
 struct Records: View {
     @ObservedObject var viewModel: RecordsViewModel
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     @Query var records: [RecordModel]
 
@@ -60,6 +62,8 @@ struct Records: View {
             records: sortedRecords,
             sort: $sort,
             recordToUpdate: $recordToUpdate,
+            monetizationState: monetizationState,
+            presentPaywall: presentPaywall,
             addRecord: { record in
                 viewModel.addRecord(record)
             },
@@ -84,10 +88,16 @@ struct RecordsContent: View {
 
     @State var isShowingSheet: Bool = false
     @State private var detentHeight: CGFloat = 0
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     var addRecord: (RecordModel) -> Void = { _ in }
     var updateRecord: (RecordModel, RecordSubmitResult) -> Void = { _, _ in }
     var deleteExercise: (RecordModel) -> Void = { _ in }
+
+    private var shouldGatePro: Bool {
+        monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -134,10 +144,21 @@ struct RecordsContent: View {
             }.ignoresSafeArea(.container, edges: .bottom)
 
             Button {
-                isShowingSheet = true
+                if shouldGatePro && records.count >= MonetizationConfig.freeRecordLimit {
+                    presentPaywall()
+                } else {
+                    isShowingSheet = true
+                }
             } label: {
                 FloatingBtn()
             }
+            .padding()
+
+            ProIndicator(
+                monetizationState: monetizationState,
+                presentPaywall: presentPaywall
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding()
         }.sheet(isPresented: $isShowingSheet) {
             RecordSheet(
@@ -193,6 +214,7 @@ struct RecordsContent: View {
             ),
         ],
         sort: $sort,
-        recordToUpdate: $recordToUpdate
+        recordToUpdate: $recordToUpdate,
+        monetizationState: MonetizationState(isLoading: false)
     )
 }

@@ -20,8 +20,11 @@ struct Goals: View {
     @Environment(\.presentToast) var presentToast
 
     @ObservedObject var viewModel: GoalsViewModel
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     @Query var goals: [Goal]
+    @Query var records: [RecordModel]
 
     @State var filter: GoalsFilter = .all
     @State var goalToUpdate: Goal? = nil
@@ -31,6 +34,9 @@ struct Goals: View {
             filter: $filter,
             goalToUpdate: $goalToUpdate,
             goals: goals,
+            records: records,
+            monetizationState: monetizationState,
+            presentPaywall: presentPaywall,
             addGoal: { result in
                 viewModel.addGoal(goalSubmitResult: result)
             },
@@ -80,11 +86,19 @@ struct GoalsContent: View {
     @State private var detentHeight: CGFloat = 0
 
     var goals: [Goal]
+    var records: [RecordModel]
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
+
     var addGoal: (GoalSubmitResult) -> Void = { _ in }
     var updateGoal: (Goal, GoalSubmitResult) -> Void = { _, _ in }
     var deleteGoal: (Goal) -> Void = { _ in }
     var moveToRecords: (Goal) -> Void = { _ in }
     var saveChanges: () -> Void = {}
+
+    private var shouldGatePro: Bool {
+        monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    }
 
     var pendingGoals: [Goal] {
         if filter == .completed {
@@ -122,7 +136,14 @@ struct GoalsContent: View {
         }
 
         Button {
-            moveToRecords(goal)
+            if shouldGatePro
+                && wouldCreateNewRecord(for: goal, records: records)
+                && records.count >= MonetizationConfig.freeRecordLimit
+            {
+                presentPaywall()
+            } else {
+                moveToRecords(goal)
+            }
         } label: {
             Label("Move to records", systemImage: "star")
         }.disabled(goal.status != .completed)
@@ -215,10 +236,21 @@ struct GoalsContent: View {
             }.ignoresSafeArea(.container, edges: .bottom)
 
             Button {
-                isShowingSheet = true
+                if shouldGatePro && goals.count >= MonetizationConfig.freeGoalLimit {
+                    presentPaywall()
+                } else {
+                    isShowingSheet = true
+                }
             } label: {
                 FloatingBtn()
             }
+            .padding()
+
+            ProIndicator(
+                monetizationState: monetizationState,
+                presentPaywall: presentPaywall
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding()
         }
         .sheet(isPresented: $isShowingSheet) {
@@ -266,6 +298,34 @@ struct GoalsContent: View {
                 targetCount: 20,
                 unit: GoalUnit.reps
             ),
-        ]
+        ],
+        records: [],
+        monetizationState: MonetizationState(isLoading: false)
     )
+}
+
+private func wouldCreateNewRecord(for goal: Goal, records: [RecordModel]) -> Bool {
+    let goalName = normalizedExerciseName(goal.name)
+    let recordUnit = mapGoalUnitToRecordUnit(goal.unit)
+
+    return !records.contains {
+        normalizedExerciseName($0.exercise) == goalName && $0.unit == recordUnit
+    }
+}
+
+private func normalizedExerciseName(_ value: String) -> String {
+    value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+}
+
+private func mapGoalUnitToRecordUnit(_ unit: GoalUnit) -> RecordUnit {
+    switch unit {
+    case .reps:
+        return .reps
+    case .sec:
+        return .sec
+    case .min:
+        return .min
+    case .km:
+        return .km
+    }
 }

@@ -13,17 +13,21 @@ import _SwiftData_SwiftUI
 enum HomeSheetType: Identifiable {
     case exercise
     case saveAsPreset
+    case statistics
 
     var id: Int { hashValue }
 }
 
 struct Home: View {
     @ObservedObject var viewModel: TrainingViewModel
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     @State var selectedDay: Date = Date().startOfDay
     @State var exerciseToEdit: TrainingExercise? = nil
 
     @Query var trainingDays: [TrainingDay]
+    @Query var presets: [Preset]
 
     var trainingDay: TrainingDay? {
         let result = trainingDays.first {
@@ -44,6 +48,9 @@ struct Home: View {
             trainingDay: trainingDay,
             trainingDays: trainingDays,
             exercises: exercises,
+            presetCount: presets.count,
+            monetizationState: monetizationState,
+            presentPaywall: presentPaywall,
             onSubmitDefaultExercise: { result in
                 if let exerciseToEdit = exerciseToEdit {
                     viewModel.updateDefaultExercise(
@@ -109,6 +116,13 @@ struct HomeContent: View {
     var trainingDay: TrainingDay?
     var trainingDays: [TrainingDay]
     var exercises: [TrainingExercise]
+    var presetCount: Int
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
+
+    private var shouldGatePro: Bool {
+        monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    }
 
     // callbacks
     var onSubmitDefaultExercise: (DefaultExerciseSubmitResult) -> Void = { _ in
@@ -138,64 +152,90 @@ struct HomeContent: View {
     }
 
     var body: some View {
-        VStack {
-            WeekSwiper(selectedDate: $selectedDate, trainingDays: trainingDays)
+        ZStack(alignment: .bottomLeading) {
+            VStack {
+                WeekSwiper(selectedDate: $selectedDate, trainingDays: trainingDays)
 
-            if let trainingDay = trainingDay {
-                Menu {
-                    Button(
-                        action: { activeSheet = .saveAsPreset }
-                    ) {
-                        Label("Save as preset", systemImage: "plus")
+                if let trainingDay = trainingDay {
+                    Menu {
+                        Button(
+                            action: { activeSheet = .saveAsPreset }
+                        ) {
+                            Label("Save as preset", systemImage: "plus")
+                        }
+                        Button(
+                            action: {
+                                if shouldGatePro {
+                                    presentPaywall()
+                                } else {
+                                    activeSheet = .statistics
+                                }
+                            }
+                        ) {
+                            Label(
+                                shouldGatePro
+                                    ? "Pro statistics" : "Show statistics",
+                                systemImage: shouldGatePro
+                                    ? "lock.fill" : "chart.bar"
+                            )
+                        }
+                        .disabled(exercises.isEmpty)
+                        Button(
+                            role: .destructive,
+                            action: { onDeleteTrainingDay(trainingDay) }
+                        ) {
+                            Label("Delete training day", systemImage: "trash")
+                        }
+                    } label: {
+                        TrainingDayHeader(
+                            selectedDate: selectedDate,
+                            status: trainingDay.status
+                        )
                     }
-                    Button(
-                        role: .destructive,
-                        action: { onDeleteTrainingDay(trainingDay) }
-                    ) {
-                        Label("Delete training day", systemImage: "trash")
-                    }
-                } label: {
-                    TrainingDayHeader(
-                        selectedDate: selectedDate,
-                        status: trainingDay.status
-                    )
+                } else {
+                    TrainingDayHeader(selectedDate: selectedDate, status: nil)
                 }
-            } else {
-                TrainingDayHeader(selectedDate: selectedDate, status: nil)
-            }
 
-            if let trainingDay = trainingDay {
-                if !trainingDay.exercises.isEmpty {
-                    ExercisesList(
-                        selectedDate: selectedDate,
-                        exercises: exercises,
-                        onAddExercisePress: {
+                if let trainingDay = trainingDay {
+                    if !trainingDay.exercises.isEmpty {
+                        ExercisesList(
+                            selectedDate: selectedDate,
+                            exercises: exercises,
+                            onAddExercisePress: {
+                                activeSheet = .exercise
+                            },
+                            onDeleteExercise: onDeleteExercise,
+                            onUpdateExercise: { exercise in
+                                exerciseToEdit = exercise
+                                activeSheet = .exercise
+                            },
+                            onExercisesChanged: saveChanges
+                        )
+                    } else {
+                        Empty(
+                            text: "No exercises yet",
+                            btnText: "Add exercise"
+                        ) {
                             activeSheet = .exercise
-                        },
-                        onDeleteExercise: onDeleteExercise,
-                        onUpdateExercise: { exercise in
-                            exerciseToEdit = exercise
-                            activeSheet = .exercise
-                        },
-                        onExercisesChanged: saveChanges
-                    )
+                        }
+                    }
                 } else {
                     Empty(
-                        text: "No exercises yet",
-                        btnText: "Add exercise"
+                        text: "No training yet",
+                        btnText: "Create training"
                     ) {
                         activeSheet = .exercise
                     }
                 }
-            } else {
-                Empty(
-                    text: "No training yet",
-                    btnText: "Create training"
-                ) {
-                    activeSheet = .exercise
-                }
             }
-        }.sheet(item: $activeSheet) { sheet in
+
+            ProIndicator(
+                monetizationState: monetizationState,
+                presentPaywall: presentPaywall
+            )
+            .padding(16)
+        }
+        .sheet(item: $activeSheet) { sheet in
             switch sheet {
             case .exercise:
                 ExerciseSheet(
@@ -222,6 +262,14 @@ struct HomeContent: View {
                 SaveAsPresetSheet(
                     onSubmit: { submitResult in
                         if let trainingDay = trainingDay {
+                            if shouldGatePro
+                                && presetCount >= MonetizationConfig.freePresetLimit
+                            {
+                                activeSheet = nil
+                                presentPaywall()
+                                return
+                            }
+
                             saveAsPreset(trainingDay, submitResult)
                             presentToast(
                                 ToastValue(message: "Saved as preset"),
@@ -232,6 +280,9 @@ struct HomeContent: View {
                 )
                 .presentationDetents([.height(saveAsPresetDetentHeight)])
                 .readAndBindHeight(to: $saveAsPresetDetentHeight)
+            case .statistics:
+                TrainingStatisticsSheet(exercises: exercises)
+                    .presentationDetents([.medium])
             }
         }
     }
@@ -274,6 +325,8 @@ struct Empty: View {
                 trainingDay: trainingDay,
                 type: ExerciseType.dynamic
             )
-        ]
+        ],
+        presetCount: 0,
+        monetizationState: MonetizationState(isLoading: false)
     )
 }

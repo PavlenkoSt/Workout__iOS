@@ -13,12 +13,16 @@ struct Presets: View {
     @Environment(\.presentToast) var presentToast
 
     @ObservedObject var viewModel: PresetsViewModel
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     @Query(sort: [SortDescriptor(\Preset.order)]) var presets: [Preset]
 
     var body: some View {
         PresetsContent(
             presets: presets,
+            monetizationState: monetizationState,
+            presentPaywall: presentPaywall,
             createPreset: { result in
                 viewModel.createPreset(result: result)
             },
@@ -102,6 +106,8 @@ struct PresetsContent: View {
     @State private var detentHeight: CGFloat = 0
     @State var searchText: String = ""
     @State var presetToUpdate: Preset? = nil
+    let monetizationState: MonetizationState
+    var presentPaywall: () -> Void = {}
 
     var createPreset: (PresetSubmitResult) -> Void = { _ in }
     var updatePreset:
@@ -134,6 +140,10 @@ struct PresetsContent: View {
         _ in
     }
     var saveChanges: () -> Void = {}
+
+    private var shouldGatePro: Bool {
+        monetizationState.isRevenueCatConfigured && !monetizationState.isPro
+    }
 
     private func handleMove(from source: IndexSet, to destination: Int) {
         guard searchText.isEmpty else { return }
@@ -225,10 +235,21 @@ struct PresetsContent: View {
             }
 
             Button {
-                isShowingSheet = true
+                if shouldGatePro && presets.count >= MonetizationConfig.freePresetLimit {
+                    presentPaywall()
+                } else {
+                    isShowingSheet = true
+                }
             } label: {
                 FloatingBtn()
             }
+            .padding()
+
+            ProIndicator(
+                monetizationState: monetizationState,
+                presentPaywall: presentPaywall
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding()
         }.sheet(isPresented: $isShowingSheet) {
             PresetSheet(
@@ -259,6 +280,7 @@ struct PresetsContent: View {
             Preset(name: "Bar training"),
             Preset(name: "Handbalance training"),
             Preset(name: "Hardcore training"),
-        ]
+        ],
+        monetizationState: MonetizationState(isLoading: false)
     )
 }
