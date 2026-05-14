@@ -78,7 +78,9 @@ final class PresetsRepository {
         let createdTrainingDay = TrainingDay(date: startDate)
         var exercises: [TrainingExercise] = []
 
-        preset.exercises.forEach { presetExercise in
+        preset.exercises
+            .sorted(by: { $0.order < $1.order })
+            .forEach { presetExercise in
             exercises.append(
                 TrainingExercise(
                     name: presetExercise.name,

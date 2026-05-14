@@ -64,6 +64,9 @@ struct Goals: View {
                         }
                     )
                 }
+            },
+            saveChanges: {
+                viewModel.saveChanges()
             }
         )
     }
@@ -81,6 +84,7 @@ struct GoalsContent: View {
     var updateGoal: (Goal, GoalSubmitResult) -> Void = { _, _ in }
     var deleteGoal: (Goal) -> Void = { _ in }
     var moveToRecords: (Goal) -> Void = { _ in }
+    var saveChanges: () -> Void = {}
 
     var pendingGoals: [Goal] {
         if filter == .completed {
@@ -156,7 +160,10 @@ struct GoalsContent: View {
 
                                 LazyVGrid(columns: columns) {
                                     ForEach(pendingGoals) { goal in
-                                        GoalItem(goal: goal)
+                                        GoalItem(
+                                            goal: goal,
+                                            onGoalChanged: saveChanges
+                                        )
                                             .contextMenu {
                                                 contextMenuItems(for: goal)
                                             }
@@ -166,7 +173,7 @@ struct GoalsContent: View {
 
                             if !completedGoals.isEmpty && filter != .pending {
                                 if filter == .all {
-                                    Text("Competed")
+                                    Text("Completed")
                                         .padding(12)
                                         .frame(maxWidth: .infinity)
                                         .cornerRadius(12)
@@ -177,7 +184,10 @@ struct GoalsContent: View {
 
                                 LazyVGrid(columns: columns) {
                                     ForEach(completedGoals) { goal in
-                                        GoalItem(goal: goal)
+                                        GoalItem(
+                                            goal: goal,
+                                            onGoalChanged: saveChanges
+                                        )
                                             .contextMenu {
                                                 contextMenuItems(for: goal)
                                             }

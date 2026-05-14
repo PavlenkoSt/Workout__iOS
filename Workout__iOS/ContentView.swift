@@ -23,7 +23,7 @@ struct ContentView: View {
     @StateObject private var trainingViewModel: TrainingViewModel
     @StateObject private var goalsViewModel: GoalsViewModel
     @StateObject private var recordsViewModel: RecordsViewModel
-    @StateObject private var presetsVideModel: PresetsViewModel
+    @StateObject private var presetsViewModel: PresetsViewModel
 
     init() {
         let tempContainer = try! ModelContainer(
@@ -60,7 +60,7 @@ struct ContentView: View {
             wrappedValue: RecordsViewModel(repository: recordsRepository)
         )
 
-        _presetsVideModel = StateObject(
+        _presetsViewModel = StateObject(
             wrappedValue: PresetsViewModel(repository: presetsRepository)
         )
     }
@@ -85,7 +85,7 @@ struct ContentView: View {
             Tab("Presets", systemImage: "heart.fill", value: .presets) {
                 NavigationStack {
                     Presets(
-                        viewModel: presetsVideModel
+                        viewModel: presetsViewModel
                     )
                 }
             }
@@ -93,7 +93,7 @@ struct ContentView: View {
             trainingViewModel.setContext(modelContext)
             goalsViewModel.setContext(modelContext)
             recordsViewModel.setContext(modelContext)
-            presetsVideModel.setContext(modelContext)
+            presetsViewModel.setContext(modelContext)
         }
     }
 }

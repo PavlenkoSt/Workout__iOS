@@ -72,4 +72,8 @@ final class TrainingRepository {
 
         try internalContext.save()
     }
+
+    func save() async throws {
+        try internalContext.save()
+    }
 }

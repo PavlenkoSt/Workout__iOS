@@ -56,7 +56,7 @@ struct LadderExerciseForm: View {
             isValid = false
         }
 
-        if let restInt = Int(step), restInt > 0 {
+        if let restInt = Int(rest), restInt > 0 {
         } else {
             restError = "Must be > 0"
             isValid = false

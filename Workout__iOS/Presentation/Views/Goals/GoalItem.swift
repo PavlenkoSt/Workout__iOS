@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GoalItem: View {
     var goal: Goal
+    var onGoalChanged: () -> Void = {}
 
     var body: some View {
         VStack {
@@ -21,6 +22,7 @@ struct GoalItem: View {
                         withAnimation(.bouncy(duration: 0.2)) {
                             goal.count -= 1
                         }
+                        onGoalChanged()
                     }
                 )
 
@@ -35,6 +37,7 @@ struct GoalItem: View {
                         withAnimation(.bouncy(duration: 0.2)) {
                             goal.count += 1
                         }
+                        onGoalChanged()
                     }
                 )
             }

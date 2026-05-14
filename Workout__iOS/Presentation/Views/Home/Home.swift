@@ -87,6 +87,9 @@ struct Home: View {
                     trainingDay: trainingDay,
                     saveAsPresetSubmitResult: saveAsPresetSubmitResult
                 )
+            },
+            saveChanges: {
+                viewModel.saveChanges()
             }
         )
     }
@@ -119,6 +122,7 @@ struct HomeContent: View {
         _,
         _ in
     }
+    var saveChanges: () -> Void = {}
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -126,7 +130,7 @@ struct HomeContent: View {
                 name: exerciseToEdit.name,
                 reps: exerciseToEdit.reps,
                 sets: exerciseToEdit.sets,
-                rest: exerciseToEdit.sets
+                rest: exerciseToEdit.rest
             )
         } else {
             nil
@@ -172,7 +176,8 @@ struct HomeContent: View {
                         onUpdateExercise: { exercise in
                             exerciseToEdit = exercise
                             activeSheet = .exercise
-                        }
+                        },
+                        onExercisesChanged: saveChanges
                     )
                 } else {
                     Empty(

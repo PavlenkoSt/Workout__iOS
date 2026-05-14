@@ -87,6 +87,9 @@ struct Presets: View {
                     )
                 }
 
+            },
+            saveChanges: {
+                viewModel.saveChanges()
             }
         )
     }
@@ -130,8 +133,11 @@ struct PresetsContent: View {
         _,
         _ in
     }
+    var saveChanges: () -> Void = {}
 
     private func handleMove(from source: IndexSet, to destination: Int) {
+        guard searchText.isEmpty else { return }
+
         var mutablePresets = presetsWithSearch
 
         mutablePresets.move(fromOffsets: source, toOffset: destination)
@@ -187,6 +193,7 @@ struct PresetsContent: View {
                                 }
                             }
                             .onMove(perform: handleMove)
+                            .moveDisabled(!searchText.isEmpty)
 
                         }.navigationDestination(for: Preset.self) {
                             preset in
@@ -201,7 +208,9 @@ struct PresetsContent: View {
                                 deleteExerciseFromPreset: deleteExercise,
                                 createTrainingDayFromPreset:
                                     createTrainingDayFromPreset,
-                                updatePresetExercisesOrder: updatePresetExercisesOrder
+                                updatePresetExercisesOrder:
+                                    updatePresetExercisesOrder,
+                                saveChanges: saveChanges
                             )
                         }
                     } else {

@@ -10,6 +10,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+@MainActor
 class RecordsViewModel: ObservableObject {
     private let repository: RecordsRepository
 
@@ -53,5 +54,19 @@ class RecordsViewModel: ObservableObject {
         recordToUpdate.count = submitedForm.count
         recordToUpdate.unit = submitedForm.units
         recordToUpdate.date = Date()
+
+        saveChanges()
+    }
+
+    func saveChanges() {
+        Task {
+            do {
+                try await self.repository.save()
+            } catch {
+                print(
+                    "Error on save records. Error \(error.localizedDescription)"
+                )
+            }
+        }
     }
 }

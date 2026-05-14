@@ -31,4 +31,8 @@ final class GoalsRepository {
         internalContext.delete(goal)
         try internalContext.save()
     }
+
+    func save() async throws {
+        try internalContext.save()
+    }
 }

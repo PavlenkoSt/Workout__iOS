@@ -25,6 +25,7 @@ class TrainingViewModel: ObservableObject {
 
     func setContext(_ context: ModelContext) {
         self.repository.updateContext(context)
+        self.presetsRepository.updateContext(context)
     }
 
     func deleteExercise(_ exercise: TrainingExercise) {
@@ -50,6 +51,7 @@ class TrainingViewModel: ObservableObject {
                 if let trainingDay = trainingDayExists {
                     let exercise = TrainingExercise(
                         name: exerciseFormResult.name,
+                        order: nextExerciseOrder(for: trainingDay),
                         sets: exerciseFormResult.sets,
                         reps: exerciseFormResult.reps,
                         rest: exerciseFormResult.rest,
@@ -73,6 +75,7 @@ class TrainingViewModel: ObservableObject {
                     )
                     let exercise = TrainingExercise(
                         name: exerciseFormResult.name,
+                        order: 1,
                         sets: exerciseFormResult.sets,
                         reps: exerciseFormResult.reps,
                         rest: exerciseFormResult.rest,
@@ -101,7 +104,8 @@ class TrainingViewModel: ObservableObject {
                 if let trainingDay = trainingDayExists {
                     let exercises = mapLadderExercises(
                         exerciseFormResult: exerciseFormResult,
-                        trainingDay: trainingDay
+                        trainingDay: trainingDay,
+                        startingOrder: nextExerciseOrder(for: trainingDay)
                     )
 
                     try await repository.addExercises(exercises)
@@ -119,7 +123,8 @@ class TrainingViewModel: ObservableObject {
 
                     let exercises = mapLadderExercises(
                         exerciseFormResult: exerciseFormResult,
-                        trainingDay: trainingDay
+                        trainingDay: trainingDay,
+                        startingOrder: 1
                     )
 
                     try await repository.addTrainingDay(trainingDay)
@@ -155,6 +160,7 @@ class TrainingViewModel: ObservableObject {
                 if let trainingDay = trainingDayExists {
                     let exercise = TrainingExercise(
                         name: "simple_exercise",
+                        order: nextExerciseOrder(for: trainingDay),
                         sets: 1,
                         reps: 1,
                         rest: 1,
@@ -177,6 +183,7 @@ class TrainingViewModel: ObservableObject {
 
                     let exercise = TrainingExercise(
                         name: "simple_exercise",
+                        order: 1,
                         sets: 1,
                         reps: 1,
                         rest: 1,
@@ -203,6 +210,8 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = exerciseFormResult.sets
         exerciseToEdit.rest = exerciseFormResult.rest
         exerciseToEdit.type = exerciseFormResult.exerciseType
+
+        saveChanges()
     }
 
     func updateSimpleExercise(
@@ -214,6 +223,18 @@ class TrainingViewModel: ObservableObject {
         exerciseToEdit.sets = 1
         exerciseToEdit.rest = 1
         exerciseToEdit.type = exerciseFormResult.exerciseType
+
+        saveChanges()
+    }
+
+    func saveChanges() {
+        Task {
+            do {
+                try await repository.save()
+            } catch {
+                print("Failed to save training changes. Error: \(error)")
+            }
+        }
     }
 
     func saveTrainingDayAsPreset(
@@ -222,7 +243,12 @@ class TrainingViewModel: ObservableObject {
     ) {
         Task {
             do {
-                let preset = Preset(name: saveAsPresetSubmitResult.name)
+                let presets = try await presetsRepository.getPresets()
+                let maxPresetOrder = presets.map { $0.order }.max()
+                let preset = Preset(
+                    name: saveAsPresetSubmitResult.name,
+                    order: (maxPresetOrder ?? -1) + 1
+                )
 
                 try await presetsRepository.createPreset(preset)
 
@@ -255,7 +281,8 @@ class TrainingViewModel: ObservableObject {
 
     private func mapLadderExercises(
         exerciseFormResult: LadderExerciseSubmitResult,
-        trainingDay: TrainingDay
+        trainingDay: TrainingDay,
+        startingOrder: Int
     ) -> [TrainingExercise] {
         var exercises: [TrainingExercise] = []
 
@@ -267,7 +294,7 @@ class TrainingViewModel: ObservableObject {
             exercises.append(
                 TrainingExercise(
                     name: exerciseFormResult.name,
-                    order: exercises.count,
+                    order: startingOrder + exercises.count,
                     sets: 1,
                     reps: current,
                     rest: exerciseFormResult.rest,
@@ -286,5 +313,9 @@ class TrainingViewModel: ObservableObject {
             : current >= exerciseFormResult.to
 
         return exercises
+    }
+
+    private func nextExerciseOrder(for trainingDay: TrainingDay) -> Int {
+        (trainingDay.exercises.map { $0.order }.max() ?? -1) + 1
     }
 }

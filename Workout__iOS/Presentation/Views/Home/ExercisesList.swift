@@ -19,6 +19,7 @@ struct ExercisesList: View {
     var onAddExercisePress: () -> Void = {}
     var onDeleteExercise: (TrainingExercise) -> Void = { _ in }
     var onUpdateExercise: (TrainingExercise) -> Void = { _ in }
+    var onExercisesChanged: () -> Void = {}
 
     private func handleMove(from source: IndexSet, to destination: Int) {
         var mutableExercises = Array(exercises)  // Create a mutable copy of the fetched results
@@ -29,12 +30,16 @@ struct ExercisesList: View {
                 exercise.order = newIndex
             }
         }
+
+        onExercisesChanged()
     }
 
     private func incrementExercise(exercise: TrainingExercise) {
+        guard exercise.setsDone < exercise.sets else { return }
         withAnimation(.default) {
             exercise.setsDone += 1
         }
+        onExercisesChanged()
     }
 
     private func decrementExercise(exercise: TrainingExercise) {
@@ -42,6 +47,7 @@ struct ExercisesList: View {
         withAnimation(.default) {
             exercise.setsDone -= 1
         }
+        onExercisesChanged()
     }
 
     var body: some View {

@@ -30,7 +30,7 @@ class PresetsViewModel: ObservableObject {
                 try await self.repository.createPreset(
                     Preset(
                         name: result.name,
-                        order: (maxPresetOrder ?? 0) + 1
+                        order: (maxPresetOrder ?? -1) + 1
                     )
                 )
             } catch {
@@ -41,6 +41,7 @@ class PresetsViewModel: ObservableObject {
 
     func updatePreset(presetToUpdate: Preset, result: PresetSubmitResult) {
         presetToUpdate.name = result.name
+        saveChanges()
     }
 
     func deletePreset(preset: Preset) {
@@ -125,7 +126,7 @@ class PresetsViewModel: ObservableObject {
 
                 let exercise = PresetExercise(
                     name: exerciseFormResult.name,
-                    order: preset.exercises.count,
+                    order: nextExerciseOrder(for: preset),
                     sets: exerciseFormResult.sets,
                     reps: exerciseFormResult.reps,
                     rest: exerciseFormResult.rest,
@@ -162,7 +163,8 @@ class PresetsViewModel: ObservableObject {
 
                 let exercises = mapLadderPresetExercises(
                     exerciseFormResult: exerciseFormResult,
-                    preset: preset
+                    preset: preset,
+                    startingOrder: nextExerciseOrder(for: preset)
                 )
 
                 try await repository.addExercisesToPreset(exercises)
@@ -194,7 +196,7 @@ class PresetsViewModel: ObservableObject {
 
                 let exercise = PresetExercise(
                     name: "simple_exercise",
-                    order: preset.exercises.count,
+                    order: nextExerciseOrder(for: preset),
                     sets: 1,
                     reps: 1,
                     rest: 1,
@@ -216,9 +218,22 @@ class PresetsViewModel: ObservableObject {
         )
     }
 
+    func saveChanges() {
+        Task {
+            do {
+                try await repository.save()
+            } catch {
+                print(
+                    "Failed to save preset changes - \(error.localizedDescription)"
+                )
+            }
+        }
+    }
+
     private func mapLadderPresetExercises(
         exerciseFormResult: LadderExerciseSubmitResult,
-        preset: Preset
+        preset: Preset,
+        startingOrder: Int
     ) -> [PresetExercise] {
         var exercises: [PresetExercise] = []
 
@@ -230,7 +245,7 @@ class PresetsViewModel: ObservableObject {
             exercises.append(
                 PresetExercise(
                     name: exerciseFormResult.name,
-                    order: exercises.count,
+                    order: startingOrder + exercises.count,
                     sets: 1,
                     reps: current,
                     rest: exerciseFormResult.rest,
@@ -249,5 +264,9 @@ class PresetsViewModel: ObservableObject {
             : current >= exerciseFormResult.to
 
         return exercises
+    }
+
+    private func nextExerciseOrder(for preset: Preset) -> Int {
+        (preset.exercises.map { $0.order }.max() ?? -1) + 1
     }
 }

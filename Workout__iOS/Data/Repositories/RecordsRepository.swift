@@ -32,21 +32,31 @@ final class RecordsRepository {
         try self.internalContext.save()
     }
 
-    func getRecordByExercise(_ exercise: String) -> RecordModel? {
+    func getRecordByExercise(
+        _ exercise: String,
+        unit: RecordUnit
+    ) -> RecordModel? {
         do {
             let descriptor = FetchDescriptor<RecordModel>(
-                predicate: #Predicate { $0.exercise.contains(exercise) },
-                sortBy: [SortDescriptor(\.date)]
+                sortBy: [SortDescriptor(\.count, order: .reverse)]
             )
 
-            guard let dayModel = try internalContext.fetch(descriptor).first
-            else {
-                return nil
-            }
+            let normalizedExercise = normalizeExerciseName(exercise)
 
-            return dayModel
+            return try internalContext.fetch(descriptor).first {
+                normalizeExerciseName($0.exercise) == normalizedExercise
+                    && $0.unit == unit
+            }
         } catch {
             return nil
         }
+    }
+
+    func save() async throws {
+        try internalContext.save()
+    }
+
+    private func normalizeExerciseName(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 }

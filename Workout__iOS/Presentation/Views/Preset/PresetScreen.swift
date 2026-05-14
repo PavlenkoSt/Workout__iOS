@@ -36,6 +36,7 @@ struct PresetScreen: View {
         _ in
     }
     var updatePresetExercisesOrder: ([PresetExercise]) -> Void = { _ in }
+    var saveChanges: () -> Void = {}
 
     var exerciseToEditFields: DefaultExerciseFormResult? {
         if let exerciseToEdit = exerciseToEdit {
@@ -43,7 +44,7 @@ struct PresetScreen: View {
                 name: exerciseToEdit.name,
                 reps: exerciseToEdit.reps,
                 sets: exerciseToEdit.sets,
-                rest: exerciseToEdit.sets
+                rest: exerciseToEdit.rest
             )
         } else {
             nil
@@ -161,6 +162,7 @@ struct PresetScreen: View {
                                 exerciseToEdit.reps = result.reps
                                 exerciseToEdit.rest = result.rest
                                 exerciseToEdit.type = result.exerciseType
+                                saveChanges()
                             } else {
                                 addDefaultExerciseToPreset(result, preset)
                             }
@@ -177,6 +179,7 @@ struct PresetScreen: View {
                                 exerciseToEdit.reps = 1
                                 exerciseToEdit.rest = 1
                                 exerciseToEdit.type = result.exerciseType
+                                saveChanges()
                             } else {
                                 addSimpleExerciseToPreset(result, preset)
                             }

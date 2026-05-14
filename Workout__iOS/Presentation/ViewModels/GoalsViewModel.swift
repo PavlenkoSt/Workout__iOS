@@ -25,6 +25,7 @@ class GoalsViewModel: ObservableObject {
 
     func setContext(_ context: ModelContext) {
         self.repository.updateContext(context)
+        self.recordsRepository.updateContext(context)
     }
 
     func addGoal(goalSubmitResult: GoalSubmitResult) {
@@ -48,6 +49,8 @@ class GoalsViewModel: ObservableObject {
         goalToUpdate.targetCount = goalSubmitResult.targetCount
         goalToUpdate.name = goalSubmitResult.name
         goalToUpdate.unit = goalSubmitResult.units
+
+        saveChanges()
     }
 
     func deleteGoal(goal: Goal) {
@@ -63,9 +66,11 @@ class GoalsViewModel: ObservableObject {
     }
 
     func moveToRecords(goal: Goal) async throws {
+        let recordUnit = mapGoalUnitsToRecordUnits(goal.unit)
         let existingRecord = self.recordsRepository
             .getRecordByExercise(
-                goal.name
+                goal.name,
+                unit: recordUnit
             )
 
         if let existingRecord = existingRecord {
@@ -75,16 +80,28 @@ class GoalsViewModel: ObservableObject {
                 )
             } else {
                 existingRecord.count = goal.count
+                existingRecord.date = Date()
+                try await recordsRepository.save()
             }
         } else {
             try await self.recordsRepository.addRecord(
                 RecordModel(
                     exercise: goal.name,
                     count: goal.count,
-                    unit: mapGoalUnitsToRecordUnits(goal.unit),
+                    unit: recordUnit,
                     date: Date()
                 )
             )
+        }
+    }
+
+    func saveChanges() {
+        Task {
+            do {
+                try await self.repository.save()
+            } catch {
+                print("Error on save goals. Error \(error.localizedDescription)")
+            }
         }
     }
 
