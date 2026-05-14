@@ -153,6 +153,17 @@ struct HomeContent: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
+            LinearGradient(
+                colors: [
+                    Color(.systemIndigo).opacity(0.14),
+                    Color(.systemTeal).opacity(0.08),
+                    Color(.systemGroupedBackground),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
             VStack {
                 WeekSwiper(selectedDate: $selectedDate, trainingDays: trainingDays)
 
@@ -294,13 +305,27 @@ struct Empty: View {
     var btnAction: () -> Void = {}
 
     var body: some View {
-        VStack {
-            Text(text).padding(12)
+        VStack(spacing: 16) {
+            Image(systemName: "figure.strengthtraining.traditional")
+                .font(.system(size: 42, weight: .semibold))
+                .foregroundStyle(.indigo)
+                .frame(width: 76, height: 76)
+                .background(.white.opacity(0.92), in: Circle())
+                .shadow(color: .indigo.opacity(0.16), radius: 16, y: 8)
+
+            Text(text)
+                .font(.headline)
+                .foregroundStyle(.primary)
+
             Button(btnText, systemImage: "plus") {
                 btnAction()
-            }.buttonStyle(.glassProminent)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.indigo)
+
             Spacer()
         }
+        .padding(.top, 42)
     }
 }
 

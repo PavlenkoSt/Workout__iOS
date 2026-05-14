@@ -15,28 +15,51 @@ struct ExerciseItem: View {
     var onDecrement: (TrainingExercise) -> Void = { _ in }
 
     var body: some View {
-        VStack {
-            HStack {
-                HStack {
-                    Text(String(index + 1))
+        VStack(spacing: 14) {
+            HStack(spacing: 12) {
+                Text(String(index + 1))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        LinearGradient(
+                            colors: [.indigo, .teal],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        in: Circle()
+                    )
+
+                VStack(alignment: .leading, spacing: 4) {
                     Text(getExerciseName(exercise: exercise))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text(
+                        exercise.type == .dynamic
+                            || exercise.type == .staticType
+                            || exercise.type == .ladder
+                            ? "Structured workout" : "Session block"
+                    )
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
                 if exercise.type == .dynamic
                     || exercise.type == .staticType
                     || exercise.type == .ladder
                 {
-                    HStack {
+                    HStack(spacing: 6) {
                         StatItem(title: "Reps", value: String(exercise.reps))
                         StatItem(title: "Sets", value: String(exercise.sets))
-                        StatItem(title: "Rest", value: "\(exercise.rest) sec.")
+                        StatItem(title: "Rest", value: "\(exercise.rest)s")
                     }
                 } else {
-                    Spacer().frame(height: 40)
+                    Spacer().frame(height: 32)
                 }
             }
 
-            HStack {
+            HStack(spacing: 12) {
                 CounterBtn(
                     text: "-",
                     action: { onDecrement(exercise) }
@@ -53,11 +76,13 @@ struct ExerciseItem: View {
                 )
             }
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 12)
-        .border(Color(.systemGray4), width: 1)
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(14)
+        .background(.white.opacity(0.94), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(.white.opacity(0.8))
+        )
+        .shadow(color: .black.opacity(0.08), radius: 16, y: 8)
     }
 }
 
@@ -66,10 +91,17 @@ private struct StatItem: View {
     var value: String
 
     var body: some View {
-        VStack {
+        VStack(spacing: 2) {
             Text(title)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(.secondary)
             Text(value)
-        }.padding(8).font(.system(size: 12))
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.primary)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .background(Color(.systemGray6).opacity(0.85), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 

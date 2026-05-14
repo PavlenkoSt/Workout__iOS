@@ -17,7 +17,7 @@ struct RecordsHeader: View {
     @Binding var sort: RecordsSorting
 
     var body: some View {
-        HStack {
+        HStack(spacing: 8) {
             RecordsHeaderBtn(
                 title: "Exercise",
                 onTap: {
@@ -43,7 +43,12 @@ struct RecordsHeader: View {
                 alignment: Alignment.trailing,
                 status: status(for: .date)
             )
-        }.padding(.horizontal, 40)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(.white.opacity(0.84), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
     }
 
     private func changeSortOrder(for field: FieldsSort) {
@@ -55,8 +60,6 @@ struct RecordsHeader: View {
                 sort.order = .desc
             }
         }
-
-        print("New Sort: \(sort.field) \(sort.order)")
     }
 
     private func status(for field: FieldsSort) -> RecordsHeaderBtnStatus {
@@ -75,14 +78,21 @@ struct RecordsHeaderBtn: View {
     var status: RecordsHeaderBtnStatus
 
     var body: some View {
-        Button(
-            title,
-            systemImage: status == .asc
-                ? "arrow.up" : status == .desc ? "arrow.down" : ""
-        ) {
+        Button {
             onTap()
+        } label: {
+            HStack(spacing: 4) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                if status != .none {
+                    Image(systemName: status == .asc ? "arrow.up" : "arrow.down")
+                        .font(.caption2.weight(.bold))
+                }
+            }
+            .foregroundColor(status == .none ? Color.secondary : Color.indigo)
+            .frame(maxWidth: .infinity, alignment: alignment)
         }
-        .frame(maxWidth: .infinity, alignment: alignment)
+        .buttonStyle(.plain)
     }
 }
 

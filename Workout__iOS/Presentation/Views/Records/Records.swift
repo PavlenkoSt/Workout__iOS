@@ -101,12 +101,24 @@ struct RecordsContent: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
+            LinearGradient(
+                colors: [
+                    Color(.systemIndigo).opacity(0.12),
+                    Color(.systemTeal).opacity(0.06),
+                    Color(.systemGroupedBackground),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
             GeometryReader { geometry in
                 VStack {
                     RecordsHeader(sort: $sort)
                     if !records.isEmpty {
                         List(records, id: \.id) { record in
-                            RecordItem(record: record).swipeActions(
+                            RecordItem(record: record)
+                                .swipeActions(
                                 edge: .trailing,
                                 allowsFullSwipe: false
                             ) {
@@ -128,15 +140,25 @@ struct RecordsContent: View {
                                         "Edit",
                                         systemImage: "square.and.pencil"
                                     )
-                                }.tint(.blue)
+                                }.tint(.indigo)
                             }
-                        }.safeAreaInset(edge: .bottom) {
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(
+                                EdgeInsets(top: 7, leading: 16, bottom: 7, trailing: 16)
+                            )
+                            .listRowBackground(Color.clear)
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                        .background(Color.clear)
+                        .safeAreaInset(edge: .bottom) {
                             Spacer().frame(
                                 height: geometry.safeAreaInsets.bottom + 80
                             )
                         }
                     } else {
                         Text("No records yet")
+                            .font(.headline)
                             .padding(30)
                         Spacer()
                     }

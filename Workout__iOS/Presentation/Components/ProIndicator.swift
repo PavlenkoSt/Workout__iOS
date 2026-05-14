@@ -15,7 +15,7 @@ struct ProIndicator: View {
                 HStack(spacing: 6) {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 14, weight: .semibold))
-                    Text("Unlock Pro")
+                    Text("Pro")
                         .font(.system(size: 13, weight: .semibold))
                 }
                 .foregroundStyle(.white)

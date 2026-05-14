@@ -21,14 +21,16 @@ struct WeekSwiperHeader: View {
             }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.indigo)
+                    .frame(width: 36, height: 36)
+                    .background(.white.opacity(0.9), in: Circle())
             }
             
             Spacer()
             
             Text(weekRangeText())
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.gray)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -39,7 +41,9 @@ struct WeekSwiperHeader: View {
             }) {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.blue)
+                    .foregroundStyle(.indigo)
+                    .frame(width: 36, height: 36)
+                    .background(.white.opacity(0.9), in: Circle())
             }
         }
         .padding(.horizontal)

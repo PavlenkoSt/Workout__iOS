@@ -101,6 +101,7 @@ struct ContentView: View {
                 }
             }
         }
+        .tint(.indigo)
         .sheet(isPresented: $isShowingPaywall) {
             PaywallSheet(viewModel: monetizationViewModel)
         }

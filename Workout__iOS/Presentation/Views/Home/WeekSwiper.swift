@@ -7,7 +7,7 @@ struct WeekSwiper: View {
     var trainingDays: [TrainingDay]
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 10) {
             // Navigation buttons
             WeekSwiperHeader(
                 onBackArrowClick: {
@@ -34,7 +34,7 @@ struct WeekSwiper: View {
                 )
             ) {
                 ForEach(-52...52, id: \.self) { offset in
-                    HStack(spacing: 5) {
+                    HStack(spacing: 8) {
                         ForEach(0..<7, id: \.self) { dayIndex in
                             let day = getDayInfo(
                                 for: dayIndex,
@@ -58,9 +58,9 @@ struct WeekSwiper: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 100)
+            .frame(height: 104)
         }
-        .padding(.top, 16)
+        .padding(.top, 14)
     }
 
     private func handleWeekChange() {
@@ -181,22 +181,44 @@ struct DayCard: View {
             VStack(spacing: 2) {
                 Text(day.name)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(isSelected ? .white : .gray)
+                    .foregroundColor(isSelected ? Color.white.opacity(0.85) : Color.secondary)
 
                 Text("\(day.number)")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(isSelected ? .white : .black)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(isSelected ? Color.white : Color.primary)
 
                 if day.isToday {
                     Text("Today")
-                        .font(.system(size: 12))
-                        .foregroundColor(isSelected ? .white : .black)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(isSelected ? Color.white : Color.indigo)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            (isSelected ? Color.white.opacity(0.18) : Color.indigo.opacity(0.1)),
+                            in: Capsule()
+                        )
                 }
             }
             .padding(.vertical, 10)
+            .frame(height: 76)
             .frame(maxWidth: .infinity)
-            .background(isSelected ? Color.blue : Color(.systemGray6))
-            .cornerRadius(12)
+            .background {
+                if isSelected {
+                    LinearGradient(
+                        colors: [.indigo, .teal],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                } else {
+                    Color(.systemBackground).opacity(0.9)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(isSelected ? .white.opacity(0.32) : .black.opacity(0.06))
+            )
+            .shadow(color: isSelected ? .indigo.opacity(0.2) : .black.opacity(0.05), radius: 10, y: 5)
             .onTapGesture {
                 onSelectDate(day.date)
             }

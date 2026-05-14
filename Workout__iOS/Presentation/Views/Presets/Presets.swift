@@ -163,6 +163,17 @@ struct PresetsContent: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
+            LinearGradient(
+                colors: [
+                    Color(.systemIndigo).opacity(0.12),
+                    Color(.systemTeal).opacity(0.06),
+                    Color(.systemGroupedBackground),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
             GeometryReader { geometry in
                 VStack {
                     PresetsHeader(
@@ -173,7 +184,8 @@ struct PresetsContent: View {
                             ForEach(presetsWithSearch) {
                                 preset in
                                 NavigationLink(value: preset) {
-                                    PresetItem(preset: preset).swipeActions(
+                                    PresetItem(preset: preset)
+                                        .swipeActions(
                                         edge: .trailing,
                                         allowsFullSwipe: false
                                     ) {
@@ -198,14 +210,23 @@ struct PresetsContent: View {
                                                 "Edit",
                                                 systemImage: "square.and.pencil"
                                             )
-                                        }.tint(.blue)
+                                        }.tint(.indigo)
                                     }
                                 }
+                                .listRowSeparator(.hidden)
+                                .listRowInsets(
+                                    EdgeInsets(top: 7, leading: 16, bottom: 7, trailing: 16)
+                                )
+                                .listRowBackground(Color.clear)
                             }
                             .onMove(perform: handleMove)
                             .moveDisabled(!searchText.isEmpty)
 
-                        }.navigationDestination(for: Preset.self) {
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                        .background(Color.clear)
+                        .navigationDestination(for: Preset.self) {
                             preset in
                             PresetScreen(
                                 preset: preset,
@@ -228,6 +249,7 @@ struct PresetsContent: View {
                             presets.isEmpty
                                 ? "No presets yet" : "Presets not found"
                         )
+                        .font(.headline)
                         .padding(12)
                         Spacer()
                     }

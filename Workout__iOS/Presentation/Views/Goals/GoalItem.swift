@@ -12,8 +12,26 @@ struct GoalItem: View {
     var onGoalChanged: () -> Void = {}
 
     var body: some View {
-        VStack {
-            Text("\(goal.name) (\(getGoalUnitName(unit: goal.unit)))")
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(goal.name)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    Text(getGoalUnitName(unit: goal.unit))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: goal.status == .completed ? "checkmark.seal.fill" : "target")
+                    .font(.title3)
+                    .foregroundStyle(goal.status == .completed ? .green : .indigo)
+            }
+
             HStack {
                 CounterBtn(
                     text: "-",
@@ -28,7 +46,8 @@ struct GoalItem: View {
 
                 CounterProgress(
                     count: goal.count,
-                    targetCount: goal.targetCount
+                    targetCount: goal.targetCount,
+                    showsCompletionBadge: false
                 )
 
                 CounterBtn(
@@ -42,10 +61,13 @@ struct GoalItem: View {
                 )
             }
         }
-        .padding(8)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .padding(12)
+        .background(.white.opacity(0.94), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.75))
+        )
+        .shadow(color: .black.opacity(0.07), radius: 14, y: 7)
     }
 }
 

@@ -157,7 +157,15 @@ struct GoalsContent: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            Color(.systemGroupedBackground)
+            LinearGradient(
+                colors: [
+                    Color(.systemIndigo).opacity(0.12),
+                    Color(.systemTeal).opacity(0.06),
+                    Color(.systemGroupedBackground),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
                 .ignoresSafeArea()
 
             GeometryReader { geometry in
@@ -171,10 +179,12 @@ struct GoalsContent: View {
                             if !pendingGoals.isEmpty && filter != .completed {
                                 if filter == .all {
                                     Text("Pending")
-                                        .padding(12)
+                                        .font(.headline.weight(.bold))
+                                        .foregroundStyle(.primary)
+                                        .padding(.vertical, 10)
                                         .frame(maxWidth: .infinity)
-                                        .cornerRadius(12)
-                                        .background(.gray.opacity(0.25))
+                                        .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .padding(.horizontal, 16)
                                 } else {
                                     Spacer().frame(height: 20)
                                 }
@@ -195,10 +205,12 @@ struct GoalsContent: View {
                             if !completedGoals.isEmpty && filter != .pending {
                                 if filter == .all {
                                     Text("Completed")
-                                        .padding(12)
+                                        .font(.headline.weight(.bold))
+                                        .foregroundStyle(.primary)
+                                        .padding(.vertical, 10)
                                         .frame(maxWidth: .infinity)
-                                        .cornerRadius(12)
-                                        .background(.gray.opacity(0.25))
+                                        .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .padding(.horizontal, 16)
                                 } else {
                                     Spacer().frame(height: 20)
                                 }
@@ -228,6 +240,7 @@ struct GoalsContent: View {
                                     ? "No completed goals yet"
                                     : "No pending goals yet"
                         )
+                        .font(.headline)
                         .padding(.vertical, 30)
                     }
 

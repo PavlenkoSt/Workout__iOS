@@ -79,8 +79,13 @@ struct ExercisesList: View {
                         onUpdateExercise(item)
                     } label: {
                         Label("Edit", systemImage: "square.and.pencil")
-                    }.tint(.blue)
+                    }.tint(.indigo)
                 }
+                .listRowSeparator(.hidden)
+                .listRowInsets(
+                    EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                )
+                .listRowBackground(Color.clear)
             }.onMove(perform: handleMove)
 
             Button(action: onAddExercisePress) {
@@ -90,11 +95,16 @@ struct ExercisesList: View {
                 }
             }
             .foregroundStyle(.white)
-            .buttonStyle(.glassProminent)
+            .buttonStyle(.borderedProminent)
+            .tint(.indigo)
             .frame(maxWidth: .infinity)
             .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
 
-        }.listStyle(.inset)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.clear)
     }
 }
 
