@@ -12,6 +12,7 @@ struct AdaptableHeightModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .ignoresSafeArea(.keyboard)
             .fixedSize(horizontal: false, vertical: true)
             .background(
                 GeometryReader { geometry in
