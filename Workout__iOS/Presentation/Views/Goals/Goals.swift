@@ -171,6 +171,7 @@ struct GoalsContent: View {
             GeometryReader { geometry in
                 VStack {
                     GoalsHeader(filter: $filter, width: geometry.size.width)
+                        .frame(maxWidth: .infinity)
 
                     Spacer().frame(height: 0)
 
