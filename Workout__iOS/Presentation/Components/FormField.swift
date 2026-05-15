@@ -23,12 +23,16 @@ struct FormField: View {
 
                 TextField(
                     placeholder,
-                    text: $text
+                    text: Binding(
+                        get: { text },
+                        set: { newValue in
+                            let filtered = inputFilter(newValue)
+                            guard filtered != text else { return }
+                            text = filtered
+                            onValueChange(filtered)
+                        }
+                    )
                 )
-                .onChange(of: text) { oldValue, newValue in
-                    text = inputFilter(newValue)
-                    onValueChange(text)
-                }
                 .keyboardType(keyboardType)
                 .focused($isFocused)
                 .padding(.vertical, 12)

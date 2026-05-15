@@ -18,8 +18,6 @@ enum Tabs: Equatable, Hashable {
 struct ContentView: View {
     @State private var selectedTab: Tabs = .home
 
-    @Environment(\.modelContext) private var modelContext
-
     @StateObject private var trainingViewModel: TrainingViewModel
     @StateObject private var goalsViewModel: GoalsViewModel
     @StateObject private var recordsViewModel: RecordsViewModel
@@ -28,22 +26,11 @@ struct ContentView: View {
 
     @State private var isShowingPaywall = false
 
-    init() {
-        let tempContainer = try! ModelContainer(
-            for: TrainingDay.self,
-            TrainingExercise.self,
-            Goal.self,
-            RecordModel.self,
-            Preset.self,
-            PresetExercise.self,
-            configurations: .init(isStoredInMemoryOnly: true)
-        )
-        let tempContext = ModelContext(tempContainer)
-
-        let trainingRepository = TrainingRepository(context: tempContext)
-        let recordsRepository = RecordsRepository(context: tempContext)
-        let goalsRepository = GoalsRepository(context: tempContext)
-        let presetsRepository = PresetsRepository(context: tempContext)
+    init(modelContext: ModelContext) {
+        let trainingRepository = TrainingRepository(context: modelContext)
+        let recordsRepository = RecordsRepository(context: modelContext)
+        let goalsRepository = GoalsRepository(context: modelContext)
+        let presetsRepository = PresetsRepository(context: modelContext)
 
         _trainingViewModel = StateObject(
             wrappedValue: TrainingViewModel(
@@ -106,10 +93,6 @@ struct ContentView: View {
             PaywallSheet(viewModel: monetizationViewModel)
         }
         .onAppear {
-            trainingViewModel.setContext(modelContext)
-            goalsViewModel.setContext(modelContext)
-            recordsViewModel.setContext(modelContext)
-            presetsViewModel.setContext(modelContext)
             monetizationViewModel.refresh()
         }
     }
@@ -121,5 +104,15 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    let container = try! ModelContainer(
+        for: TrainingDay.self,
+        TrainingExercise.self,
+        Goal.self,
+        RecordModel.self,
+        Preset.self,
+        PresetExercise.self,
+        configurations: .init(isStoredInMemoryOnly: true)
+    )
+    return ContentView(modelContext: container.mainContext)
+        .modelContainer(container)
 }

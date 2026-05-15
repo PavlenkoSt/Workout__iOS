@@ -33,7 +33,7 @@ struct WorkoutApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(modelContext: container.mainContext)
                 .installToast(position: .bottom)
         }.modelContainer(container)
     }

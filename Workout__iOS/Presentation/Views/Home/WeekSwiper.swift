@@ -1,24 +1,51 @@
 import SwiftUI
 
+private let weekRangeFormatter: DateFormatter = {
+    let df = DateFormatter()
+    df.dateFormat = "MMM d"
+    return df
+}()
+
 struct WeekSwiper: View {
     @State private var currentWeekOffset = 0
 
     @Binding var selectedDate: Date
     var trainingDays: [TrainingDay]
 
+    private var mondayOfCurrentWeek: Date {
+        let calendar = Calendar.current
+        let today = Date().startOfDay
+        let weekday = calendar.component(.weekday, from: today)
+        let daysFromMonday = (weekday - 2 + 7) % 7
+        return calendar.date(byAdding: .day, value: -daysFromMonday, to: today)!
+    }
+
+    private var statusByDay: [Date: TrainingDayStatus] {
+        var result: [Date: TrainingDayStatus] = [:]
+        result.reserveCapacity(trainingDays.count)
+        for day in trainingDays {
+            result[day.date.startOfDay] = day.status
+        }
+        return result
+    }
+
     var body: some View {
+        let monday = mondayOfCurrentWeek
+        let statusLookup = statusByDay
+        let selectedStart = selectedDate.startOfDay
+
         VStack(spacing: 10) {
             // Navigation buttons
             WeekSwiperHeader(
                 onBackArrowClick: {
                     currentWeekOffset -= 1
-                    handleWeekChange()
+                    handleWeekChange(monday: monday)
                 },
                 onForwardArrowClick: {
                     currentWeekOffset += 1
-                    handleWeekChange()
+                    handleWeekChange(monday: monday)
                 },
-                weekRangeText: weekRangeText
+                weekRangeText: { weekRangeText(monday: monday) }
             )
 
             // Week carousel with TabView
@@ -28,7 +55,7 @@ struct WeekSwiper: View {
                     set: { newOffset in
                         withAnimation {
                             currentWeekOffset = newOffset
-                            handleWeekChange()
+                            handleWeekChange(monday: monday)
                         }
                     }
                 )
@@ -38,18 +65,14 @@ struct WeekSwiper: View {
                         ForEach(0..<7, id: \.self) { dayIndex in
                             let day = getDayInfo(
                                 for: dayIndex,
-                                weekOffset: offset
+                                weekOffset: offset,
+                                monday: monday
                             )
                             DayCard(
                                 day: day,
-                                isSelected: isDateSelected(day.date),
+                                isSelected: day.date == selectedStart,
                                 onSelectDate: { date in selectedDate = date },
-                                status: trainingDays.filter {
-                                    Calendar.current.isDate(
-                                        $0.date,
-                                        inSameDayAs: day.date
-                                    )
-                                }.first?.status
+                                status: statusLookup[day.date]
                             )
                         }
                     }
@@ -63,7 +86,7 @@ struct WeekSwiper: View {
         .padding(.top, 14)
     }
 
-    private func handleWeekChange() {
+    private func handleWeekChange(monday: Date) {
         let today = Date().startOfDay
 
         // If viewing current week (offset = 0), select today
@@ -71,56 +94,21 @@ struct WeekSwiper: View {
             selectedDate = today
         } else {
             // Otherwise, select Monday of the viewed week
-            let monday = getMondayOfWeek(weekOffset: currentWeekOffset)
-                .startOfDay
-            selectedDate = monday
+            let offsetMonday = Calendar.current.date(
+                byAdding: .day,
+                value: currentWeekOffset * 7,
+                to: monday
+            )!.startOfDay
+            selectedDate = offsetMonday
         }
     }
 
-    private func getMondayOfWeek(weekOffset: Int) -> Date {
+    private func getDayInfo(
+        for index: Int,
+        weekOffset: Int,
+        monday: Date
+    ) -> (name: String, number: Int, isToday: Bool, date: Date) {
         let calendar = Calendar.current
-        let today = Date().startOfDay
-
-        // Get Monday of current week
-        let weekday = calendar.component(.weekday, from: today)
-        let daysFromMonday = (weekday - 2 + 7) % 7
-
-        let monday = calendar.date(
-            byAdding: .day,
-            value: -daysFromMonday,
-            to: today
-        )!
-
-        // Apply the offset to get Monday of the target week
-        let offsetMonday = calendar.date(
-            byAdding: .day,
-            value: weekOffset * 7,
-            to: monday
-        )!
-
-        return offsetMonday
-    }
-
-    private func isDateSelected(_ date: Date) -> Bool {
-        let calendar = Calendar.current
-        return calendar.isDate(date, inSameDayAs: selectedDate)
-    }
-
-    private func getDayInfo(for index: Int, weekOffset: Int) -> (
-        name: String, number: Int, isToday: Bool, date: Date
-    ) {
-        let calendar = Calendar.current
-        let today = Date().startOfDay
-
-        // Get Monday of current week
-        let weekday = calendar.component(.weekday, from: today)
-        let daysFromMonday = (weekday - 2 + 7) % 7
-
-        let monday = calendar.date(
-            byAdding: .day,
-            value: -daysFromMonday,
-            to: today
-        )!
 
         // Add offset weeks and the day index
         let date = calendar.date(
@@ -140,19 +128,8 @@ struct WeekSwiper: View {
         return (dayName, dayNumber, isToday, date)
     }
 
-    private func weekRangeText() -> String {
+    private func weekRangeText(monday: Date) -> String {
         let calendar = Calendar.current
-        let today = Date().startOfDay
-
-        // Get Monday of current week
-        let weekday = calendar.component(.weekday, from: today)
-        let daysFromMonday = (weekday - 2 + 7) % 7
-
-        let monday = calendar.date(
-            byAdding: .day,
-            value: -daysFromMonday,
-            to: today
-        )!
 
         // Apply the offset to get the correct week
         let offsetMonday = calendar.date(
@@ -162,11 +139,8 @@ struct WeekSwiper: View {
         )!
         let sunday = calendar.date(byAdding: .day, value: 6, to: offsetMonday)!
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d"
-
         return
-            "\(dateFormatter.string(from: offsetMonday)) - \(dateFormatter.string(from: sunday))"
+            "\(weekRangeFormatter.string(from: offsetMonday)) - \(weekRangeFormatter.string(from: sunday))"
     }
 }
 
