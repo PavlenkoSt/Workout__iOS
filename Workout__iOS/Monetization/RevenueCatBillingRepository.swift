@@ -9,6 +9,7 @@ import RevenueCat
 final class RevenueCatBillingRepository {
     private let defaults: UserDefaults
     private let localProUnlockedKey = "local_pro_unlocked"
+    private let confirmedProKey = "confirmed_pro_from_purchase"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -22,6 +23,14 @@ final class RevenueCatBillingRepository {
         defaults.bool(forKey: localProUnlockedKey)
     }
 
+    var isConfirmedProFromPurchase: Bool {
+        defaults.bool(forKey: confirmedProKey)
+    }
+
+    func setConfirmedProFromPurchase(_ value: Bool) {
+        defaults.set(value, forKey: confirmedProKey)
+    }
+
     func getCustomerInfo() async throws -> CustomerInfo? {
         guard isConfigured else { return nil }
         return try await Purchases.shared.customerInfo()
@@ -32,12 +41,15 @@ final class RevenueCatBillingRepository {
         return try await Purchases.shared.restorePurchases()
     }
 
-    func isPro(customerInfo: CustomerInfo?) -> Bool {
-        if isLocalProUnlocked { return true }
-
-        return customerInfo?
+    func isProFromCustomerInfo(_ customerInfo: CustomerInfo?) -> Bool {
+        customerInfo?
             .entitlements[MonetizationConfig.proEntitlementID]?
             .isActive == true
+    }
+
+    func isPro(customerInfo: CustomerInfo?) -> Bool {
+        if isLocalProUnlocked { return true }
+        return isProFromCustomerInfo(customerInfo)
     }
 
     func unlockWithCode(_ code: String) -> Bool {

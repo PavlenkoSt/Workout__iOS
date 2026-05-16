@@ -6,7 +6,7 @@
 import Foundation
 
 enum MonetizationConfig {
-    static let proEntitlementID = "pro"
+    static let proEntitlementID = "Workout Unlimited"
     static let freePresetLimit = 3
     static let freeGoalLimit = 5
     static let freeRecordLimit = 10

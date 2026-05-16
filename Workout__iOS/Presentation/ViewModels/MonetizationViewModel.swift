@@ -12,12 +12,14 @@ final class MonetizationViewModel: ObservableObject {
     @Published private(set) var state: MonetizationState
 
     private let billingRepository: RevenueCatBillingRepository
+    private var customerInfoTask: Task<Void, Never>?
 
     init() {
         self.billingRepository = RevenueCatBillingRepository()
         self.state = MonetizationViewModel.makeInitialState(
             billingRepository: billingRepository
         )
+        startObservingCustomerInfo()
     }
 
     init(billingRepository: RevenueCatBillingRepository) {
@@ -25,13 +27,24 @@ final class MonetizationViewModel: ObservableObject {
         self.state = MonetizationViewModel.makeInitialState(
             billingRepository: billingRepository
         )
+        startObservingCustomerInfo()
+    }
+
+    deinit {
+        customerInfoTask?.cancel()
     }
 
     private static func makeInitialState(
         billingRepository: RevenueCatBillingRepository
     ) -> MonetizationState {
-        MonetizationState(
-            isPro: billingRepository.isLocalProUnlocked,
+        // Instant correct state on launch: use the last confirmed result
+        // from RevenueCat (persisted locally) so we don't flash "locked"
+        // before the customerInfoStream emits.
+        let instantIsPro = billingRepository.isLocalProUnlocked
+            || billingRepository.isConfirmedProFromPurchase
+        return MonetizationState(
+            isLoading: false,
+            isPro: instantIsPro,
             isLocalProUnlocked: billingRepository.isLocalProUnlocked,
             isRevenueCatConfigured: billingRepository.isConfigured
                 || MonetizationConfig.hasRevenueCatAPIKey
@@ -39,27 +52,16 @@ final class MonetizationViewModel: ObservableObject {
     }
 
     func refresh() {
-        Task {
-            RevenueCatInitializer.configure()
-            state.isLoading = true
-            state.message = nil
-            state.isRevenueCatConfigured = billingRepository.isConfigured
-                || MonetizationConfig.hasRevenueCatAPIKey
-            state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
-            state.isPro = billingRepository.isLocalProUnlocked || state.isPro
-
-            do {
-                let customerInfo = try await billingRepository.getCustomerInfo()
-                state.isLoading = false
-                state.isPro = billingRepository.isPro(customerInfo: customerInfo)
-                state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
-                state.isRevenueCatConfigured = billingRepository.isConfigured
-                    || MonetizationConfig.hasRevenueCatAPIKey
-            } catch {
-                state.isLoading = false
-                state.message = billingRepository.errorMessage(error)
-            }
+        RevenueCatInitializer.configure()
+        state.message = nil
+        state.isRevenueCatConfigured = billingRepository.isConfigured
+            || MonetizationConfig.hasRevenueCatAPIKey
+        state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
+        if billingRepository.isLocalProUnlocked
+            || billingRepository.isConfirmedProFromPurchase {
+            state.isPro = true
         }
+        startObservingCustomerInfo()
     }
 
     func restore() {
@@ -67,7 +69,6 @@ final class MonetizationViewModel: ObservableObject {
             do {
                 let customerInfo = try await billingRepository.restorePurchases()
                 applyCustomerInfo(customerInfo)
-                state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
                 state.message = state.isPro ? "Purchase restored" : "No Pro purchase found"
             } catch {
                 state.message = billingRepository.errorMessage(error)
@@ -77,18 +78,34 @@ final class MonetizationViewModel: ObservableObject {
 
     @discardableResult
     func applyCustomerInfo(_ customerInfo: CustomerInfo?) -> Bool {
-        state.isPro = billingRepository.isPro(customerInfo: customerInfo)
+        let backendPro = billingRepository.isProFromCustomerInfo(customerInfo)
+        billingRepository.setConfirmedProFromPurchase(backendPro)
         state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
         state.isRevenueCatConfigured = billingRepository.isConfigured
             || MonetizationConfig.hasRevenueCatAPIKey
+        state.isPro = backendPro || state.isLocalProUnlocked
         return state.isPro
     }
 
     func unlockWithCode(_ code: String) -> Bool {
         let unlocked = billingRepository.unlockWithCode(code)
-        state.isPro = billingRepository.isPro(customerInfo: nil)
         state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
+        state.isPro = state.isLocalProUnlocked
+            || billingRepository.isConfirmedProFromPurchase
         state.message = unlocked ? "Pro unlocked" : "Invalid access code"
         return unlocked
+    }
+
+    private func startObservingCustomerInfo() {
+        customerInfoTask?.cancel()
+        guard Purchases.isConfigured else {
+            customerInfoTask = nil
+            return
+        }
+        customerInfoTask = Task { [weak self] in
+            for await customerInfo in Purchases.shared.customerInfoStream {
+                await self?.applyCustomerInfo(customerInfo)
+            }
+        }
     }
 }
