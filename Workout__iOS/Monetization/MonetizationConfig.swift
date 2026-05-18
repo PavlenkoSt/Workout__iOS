@@ -19,10 +19,6 @@ enum MonetizationConfig {
         !revenueCatAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    static var proUnlockCode: String {
-        configValue(for: "PRO_UNLOCK_CODE")
-    }
-
     private static func configValue(for key: String) -> String {
         let bundleValue = Bundle.main.object(forInfoDictionaryKey: key) as? String
         if let bundleValue, !bundleValue.isEmpty {

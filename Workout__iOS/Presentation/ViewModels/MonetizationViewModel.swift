@@ -40,12 +40,10 @@ final class MonetizationViewModel: ObservableObject {
         // Instant correct state on launch: use the last confirmed result
         // from RevenueCat (persisted locally) so we don't flash "locked"
         // before the customerInfoStream emits.
-        let instantIsPro = billingRepository.isLocalProUnlocked
-            || billingRepository.isConfirmedProFromPurchase
+        let instantIsPro = billingRepository.isConfirmedProFromPurchase
         return MonetizationState(
             isLoading: false,
             isPro: instantIsPro,
-            isLocalProUnlocked: billingRepository.isLocalProUnlocked,
             isRevenueCatConfigured: billingRepository.isConfigured
                 || MonetizationConfig.hasRevenueCatAPIKey
         )
@@ -56,9 +54,7 @@ final class MonetizationViewModel: ObservableObject {
         state.message = nil
         state.isRevenueCatConfigured = billingRepository.isConfigured
             || MonetizationConfig.hasRevenueCatAPIKey
-        state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
-        if billingRepository.isLocalProUnlocked
-            || billingRepository.isConfirmedProFromPurchase {
+        if billingRepository.isConfirmedProFromPurchase {
             state.isPro = true
         }
         startObservingCustomerInfo()
@@ -80,20 +76,10 @@ final class MonetizationViewModel: ObservableObject {
     func applyCustomerInfo(_ customerInfo: CustomerInfo?) -> Bool {
         let backendPro = billingRepository.isProFromCustomerInfo(customerInfo)
         billingRepository.setConfirmedProFromPurchase(backendPro)
-        state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
         state.isRevenueCatConfigured = billingRepository.isConfigured
             || MonetizationConfig.hasRevenueCatAPIKey
-        state.isPro = backendPro || state.isLocalProUnlocked
+        state.isPro = backendPro
         return state.isPro
-    }
-
-    func unlockWithCode(_ code: String) -> Bool {
-        let unlocked = billingRepository.unlockWithCode(code)
-        state.isLocalProUnlocked = billingRepository.isLocalProUnlocked
-        state.isPro = state.isLocalProUnlocked
-            || billingRepository.isConfirmedProFromPurchase
-        state.message = unlocked ? "Pro unlocked" : "Invalid access code"
-        return unlocked
     }
 
     private func startObservingCustomerInfo() {
@@ -104,7 +90,7 @@ final class MonetizationViewModel: ObservableObject {
         }
         customerInfoTask = Task { [weak self] in
             for await customerInfo in Purchases.shared.customerInfoStream {
-                await self?.applyCustomerInfo(customerInfo)
+                self?.applyCustomerInfo(customerInfo)
             }
         }
     }

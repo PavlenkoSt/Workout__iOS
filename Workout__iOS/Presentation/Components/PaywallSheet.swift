@@ -11,13 +11,10 @@ struct PaywallSheet: View {
     @ObservedObject var viewModel: MonetizationViewModel
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isShowingAccessCode = false
-    @State private var accessCode = ""
-    @State private var accessCodeError: String?
-
     var body: some View {
         ZStack {
             PaywallView()
+                .safeAreaPadding(.bottom, 16)
                 .onPurchaseCompleted { customerInfo in
                     dismissIfPro(customerInfo)
                 }
@@ -27,20 +24,6 @@ struct PaywallSheet: View {
 
             VStack {
                 HStack {
-                    Button("Access code") {
-                        accessCode = ""
-                        accessCodeError = nil
-                        isShowingAccessCode = true
-                    }
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .frame(height: 36)
-                    .background(.black.opacity(0.45))
-                    .clipShape(Capsule())
-                    .padding(.top, 8)
-                    .padding(.leading, 12)
-
                     Spacer()
 
                     Button {
@@ -53,28 +36,13 @@ struct PaywallSheet: View {
                             .background(.black.opacity(0.45))
                             .clipShape(Circle())
                     }
-                    .padding(.top, 8)
-                    .padding(.trailing, 12)
+                    .padding(.top, 12)
+                    .padding(.trailing, 16)
                 }
 
                 Spacer()
             }
-        }
-        .alert("Access code", isPresented: $isShowingAccessCode) {
-            TextField("Code", text: $accessCode)
-            Button("Unlock") {
-                if viewModel.unlockWithCode(accessCode) {
-                    dismiss()
-                } else {
-                    accessCodeError = "Invalid code"
-                    isShowingAccessCode = true
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            if let accessCodeError {
-                Text(accessCodeError)
-            }
+            .safeAreaPadding(.top, 8)
         }
         .onDisappear {
             viewModel.refresh()
